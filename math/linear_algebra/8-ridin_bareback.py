@@ -5,6 +5,7 @@
     Multiplies two 2D matrices.
 """
 
+
 def mat_mul(mat1, mat2):
     """
     Multiplies two 2D matrices mat1 and mat2.
