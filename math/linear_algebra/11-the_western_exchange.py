@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Module for transposing a NumPy matrix"""
 
+
 def np_transpose(matrix):
     """
     Transposes a NumPy array.
