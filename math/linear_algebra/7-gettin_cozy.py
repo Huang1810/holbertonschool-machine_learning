@@ -14,8 +14,9 @@ def cat_matrices2D(mat1, mat2, axis=0):
         axis (int): The axis along which to concatenate (0 for rows, 1 for columns).
 
     Returns:
-        list: A new 2D matrix resulting from concatenating mat1 and mat2 along the specified axis.
-              If the matrices cannot be concatenated, returns None.
+        list: A new 2D matrix resulting from concatenating mat1 and mat2
+              along the specified axis. If the matrices cannot be concatenated,
+              returns None.
     """
     if axis == 0:
 
