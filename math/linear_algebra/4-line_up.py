@@ -4,8 +4,6 @@ This module provides a function to add two arrays element-wise.
 """
 
 
-
-
 def add_arrays(arr1, arr2):
     """
     Adds two arrays element-wise.
