@@ -13,7 +13,8 @@ def add_arrays(arr1, arr2):
         arr2 (list of int/float): Second array.
 
     Returns:
-        list or None: New array with element-wise sums or None if shapes differ.
+        list or None: New array with element-wise sums or None
+                      if shapes differ.
     """
     if len(arr1) != len(arr2):
         return None
