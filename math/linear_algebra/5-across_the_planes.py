@@ -14,8 +14,13 @@ def add_matrices2D(mat1, mat2):
 
     Returns:
         list or None: New matrix with element-wise sums or None
-                      if shapes differ.
+        if shapes differ.
     """
-    if len(mat1) != len(mat2) or any(len(r1) != len(r2) for r1, r2 in zip(mat1, mat2)):
+    if len(mat1) != len(mat2) or any(
+        len(r1) != len(r2) for r1, r2 in zip(mat1, mat2)
+    ):
         return None
-    return [[a + b for a, b in zip(row1, row2)] for row1, row2 in zip(mat1, mat2)]
+    return [
+        [a + b for a, b in zip(row1, row2)]
+        for row1, row2 in zip(mat1, mat2)
+    ]
