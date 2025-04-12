@@ -1,40 +1,27 @@
 #!/usr/bin/env python3
-
 """
-Module 10-matisse
-This module provides a function to calculate the derivative of a polynomial.
+This Module contains a Function that Calculate the derivative of a polynomial.
 """
 
 
 def poly_derivative(poly):
     """
-    Calculate the derivative of a polynomial.
+    Function that Calculate the derivative of a polynomial.
 
     Args:
-        poly (list of int): A list of coefficients representing a polynomial.
+    poly (list): Coefficients, index is power of x.
 
     Returns:
-        list: A list of coefficients representing the derivative of the polynomial.
-              Returns [0] if the derivative is 0.
-              Returns None if the input is invalid.
+    list: Coefficients of the derivative.
+    None: Input is invalid.
+    [0]: Polynomial is constant.
     """
-
-    if not isinstance(poly, list) or not all(
-            isinstance(coef, (int, float)) for coef in poly):
+    if not isinstance(poly, list) or not poly or not all(isinstance(c, int)
+                                                         for c in poly):
         return None
 
-
-    if not poly:
-        return None
-
-
-    derivative = []
-    for power, coef in enumerate(poly):
-        if power > 0:
-            derivative.append(coef * power)
-
-
-    if not derivative:
+    if len(poly) == 1:
         return [0]
 
+    derivative = [poly[i] * i for i in range(1, len(poly))]
     return derivative
