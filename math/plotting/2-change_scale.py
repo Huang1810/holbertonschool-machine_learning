@@ -6,6 +6,14 @@ import matplotlib.pyplot as plt
 
 
 def change_scale():
+    """
+    Plot the exponential decay of Carbon-14.
+
+    This function uses the half-life of Carbon-14 to compute and plot
+    the fraction of Carbon-14 remaining over time, on a logarithmic scale.
+    The x-axis represents time in years, and the y-axis shows the
+    fraction remaining on a logarithmic scale.
+    """
     x = np.arange(0, 28651, 5730)
     r = np.log(0.5)
     t = 5730
