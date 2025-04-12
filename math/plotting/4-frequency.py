@@ -1,21 +1,49 @@
 #!/usr/bin/env python3
-"""This module plots a histogram of student grades for Project A."""
-
+"""
+This Module plots a histogram of student grades for a project.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 def frequency():
-    """Plot a histogram of student scores with bins every 10 units."""
+    """
+    This function creates a histogram representing the distribution of student
+    grades. The histogram's bars are outlined in black, with bins every 10
+    units to categorize the grades. The plot is titled 'Project A', with
+    the x-axis labeled 'Grades' and the y-axis labeled 'Number of Students'.
+
+    Parameters:
+    None
+
+    Returns:
+    None. Displays a matplotlib figure.
+
+    Example:
+    >>> frequency()
+    # This will display the histogram in a matplotlib viewer.
+    """
+    # Seed the random number generator for reproducibility
     np.random.seed(5)
+    # Generate student grades data
     student_grades = np.random.normal(68, 15, 50)
+
+    # Clip any negative grades (just in case)
+    student_grades = np.clip(student_grades, 0, None)
+
+    # Set the figure size
     plt.figure(figsize=(6.4, 4.8))
 
-    bins = np.arange(0, 101, 10)  # bins every 10 units from 0 to 100
-    plt.hist(student_grades, bins=bins, edgecolor='black')
+    # Plot the histogram
+    plt.hist(student_grades, bins=range(0, 101, 10), edgecolor='black')
+    plt.xticks(range(0, 101, 10))
+    plt.xlim(0, 100)
+    plt.ylim(0, 30)
 
+    # Set the title and labels
     plt.xlabel('Grades')
     plt.ylabel('Number of Students')
     plt.title('Project A')
 
+    # Show the plot
     plt.show()
