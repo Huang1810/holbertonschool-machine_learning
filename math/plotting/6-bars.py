@@ -18,11 +18,11 @@ def bars():
     # Create a figure
     plt.figure(figsize=(6.4, 4.8))
 
-    # Create a stacked bar plot
-    plt.bar(people, fruit[0], color=colors[0], label='Apples')
-    plt.bar(people, fruit[1], bottom=fruit[0], color=colors[1], label='Bananas')
-    plt.bar(people, fruit[2], bottom=fruit[0] + fruit[1], color=colors[2], label='Oranges')
-    plt.bar(people, fruit[3], bottom=fruit[0] + fruit[1] + fruit[2], color=colors[3], label='Peaches')
+    # Create a stacked bar plot with a bar width of 0.5
+    plt.bar(people, fruit[0], color=colors[0], label='Apples', width=0.5)  # Apples
+    plt.bar(people, fruit[1], bottom=fruit[0], color=colors[1], label='Bananas', width=0.5)  # Bananas
+    plt.bar(people, fruit[2], bottom=fruit[0] + fruit[1], color=colors[2], label='Oranges', width=0.5)  # Oranges
+    plt.bar(people, fruit[3], bottom=fruit[0] + fruit[1] + fruit[2], color=colors[3], label='Peaches', width=0.5)  # Peaches
 
     # Set the labels and title
     plt.xlabel('People', fontsize='x-small')
