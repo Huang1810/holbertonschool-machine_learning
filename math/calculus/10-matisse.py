@@ -19,16 +19,20 @@ def poly_derivative(poly):
               Returns None if the input is invalid.
     """
 
+
     if not isinstance(poly, list) or not all(isinstance(coef, (int, float)) for coef in poly):
         return None
 
-    if len(poly) == 1:
-        return [0]
+
+    if not poly:
+        return None
+
 
     derivative = []
     for power, coef in enumerate(poly):
         if power > 0:
             derivative.append(coef * power)
+
 
     if not derivative:
         return [0]
