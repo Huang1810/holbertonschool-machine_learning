@@ -5,6 +5,7 @@ Module 10-matisse
 This module provides a function to calculate the derivative of a polynomial.
 """
 
+
 def poly_derivative(poly):
     """
     Calculate the derivative of a polynomial.
