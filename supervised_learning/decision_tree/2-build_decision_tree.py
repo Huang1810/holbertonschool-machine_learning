@@ -34,30 +34,12 @@ class Node:
         Returns a formatted string representation of the subtree rooted at this node.
         """
         prefix = "root" if self.is_root else "-> node"
-        result = f"{prefix} [feature={self.feature}, threshold={self.threshold}]\n"
+        result = f"{prefix} [feature={self.feature}, threshold={self.threshold}]"
         if self.left_child:
-            result += self._add_left_prefix(str(self.left_child).strip())
+            result += "\n" + left_child_add_prefix(str(self.left_child))
         if self.right_child:
-            result += self._add_right_prefix(str(self.right_child).strip())
+            result += "\n" + right_child_add_prefix(str(self.right_child))
         return result
-
-    def _add_left_prefix(self, text):
-        """
-        Formats the left child's string representation with indentation.
-        """
-        lines = text.split("\n")
-        output = "    +--" + lines[0] + "\n"
-        output += "\n".join(f"    |  {line}" for line in lines[1:] if line) + "\n"
-        return output
-
-    def _add_right_prefix(self, text):
-        """
-        Formats the right child's string representation with indentation.
-        """
-        lines = text.split("\n")
-        output = "    +--" + lines[0] + "\n"
-        output += "\n".join(f"       {line}" for line in lines[1:] if line) + "\n"
-        return output
 
     def max_depth_below(self):
         """
@@ -93,7 +75,7 @@ class Node:
         return count
 
 
-class Leaf(Node):
+class Leaf:
     """
     Represents a terminal (leaf) node in the decision tree.
 
@@ -102,7 +84,6 @@ class Leaf(Node):
         depth (int): Depth of the leaf in the tree.
     """
     def __init__(self, value, depth=None):
-        super().__init__()
         self.value = value
         self.is_leaf = True
         self.depth = depth
@@ -152,7 +133,7 @@ class Decision_Tree:
         """
         Returns a string representation of the entire tree.
         """
-        return str(self.root)
+        return self.root.__str__()
 
     def depth(self):
         """
@@ -171,3 +152,43 @@ class Decision_Tree:
             int: Total number of nodes or leaf nodes.
         """
         return self.root.count_nodes_below(only_leaves=only_leaves)
+
+
+def left_child_add_prefix(text):
+    """
+    Formats the left child's string representation with indentation.
+
+    Args:
+        text (str): String representation of the child node.
+
+    Returns:
+        str: Formatted string with tree-like indentation.
+    """
+    lines = text.split("\n")
+    new_text = "    +---" + lines[0] + "\n"
+    for x in lines[1:]:
+        if x.strip():  # Only add prefix to non-empty lines
+            new_text += ("    |  " + x) + "\n"
+        else:
+            new_text += "\n"
+    return new_text.rstrip("\n")
+
+
+def right_child_add_prefix(text):
+    """
+    Formats the right child's string representation with indentation.
+
+    Args:
+        text (str): String representation of the child node.
+
+    Returns:
+        str: Formatted string with tree-like indentation.
+    """
+    lines = text.split("\n")
+    new_text = "    +---" + lines[0] + "\n"
+    for x in lines[1:]:
+        if x.strip():  # Only add prefix to non-empty lines
+            new_text += ("       " + x) + "\n"
+        else:
+            new_text += "\n"
+    return new_text.rstrip("\n")
