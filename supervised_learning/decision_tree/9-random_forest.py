@@ -16,12 +16,6 @@ class Random_Forest:
     This class implements a Random Forest classifier using Decision Trees
     as its base learners. It includes methods for fitting the model to training
     data, making predictions, and calculating accuracy.
-
-    Example Usage:
-        rf = Random_Forest()
-        rf.fit(train_explanatory, train_target)
-        predictions = rf.predict(test_explanatory)
-        acc = rf.accuracy(test_explanatory, test_target)
     """
 
     def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0):
@@ -31,7 +25,8 @@ class Random_Forest:
         Args:
             n_trees (int): Number of trees in the forest (default is 100).
             max_depth (int): Maximum depth of each decision tree (default is 10).
-            min_pop (int): Minimum samples required to split a node (default is 1).
+            min_pop (int): Minimum samples required to split a node
+                           (default is 1).
             seed (int): Seed for random number generation (default is 0).
         """
         self.numpy_predicts = []
@@ -63,7 +58,8 @@ class Random_Forest:
         # Calculate the mode (most frequent) prediction for each example
         mode_predictions = []
         for example_predictions in predictions.T:
-            unique_values, counts = np.unique(example_predictions, return_counts=True)
+            unique_values, counts = np.unique(example_predictions,
+                                              return_counts=True)
             mode_index = np.argmax(counts)
             mode_predictions.append(unique_values[mode_index])
 
@@ -77,7 +73,8 @@ class Random_Forest:
             explanatory (numpy.ndarray): Input features for training.
             target (numpy.ndarray): Target variable for training.
             n_trees (int): Number of trees in the forest (default is 100).
-            verbose (int): Verbosity level (0 for silent, 1 for detailed output).
+            verbose (int): Verbosity level (0 for silent, 1 for detailed
+                           output).
 
         Returns:
             None
@@ -91,8 +88,9 @@ class Random_Forest:
         accuracies = []
 
         for i in range(n_trees):
-            # Create a decision tree with an adjusted seed to ensure variation
-            T = Decision_Tree(max_depth=self.max_depth, min_pop=self.min_pop, seed=self.seed + i)
+            T = Decision_Tree(max_depth=self.max_depth,
+                              min_pop=self.min_pop,
+                              seed=self.seed + i)
             T.fit(explanatory, target)
             self.numpy_preds.append(T.predict)
             depths.append(T.depth())
@@ -102,11 +100,16 @@ class Random_Forest:
 
         if verbose == 1:
             print("  Training finished.")
-            print(f"    - Mean depth                     : {np.mean(depths)}")
-            print(f"    - Mean number of nodes           : {np.mean(nodes)}")
-            print(f"    - Mean number of leaves          : {np.mean(leaves)}")
-            print(f"    - Mean accuracy on training data : {np.mean(accuracies)}")
-            print(f"    - Accuracy of the forest on td   : {self.accuracy(self.explanatory, self.target)}")
+            print(f"    - Mean depth                     : "
+                  f"{np.mean(depths)}")
+            print(f"    - Mean number of nodes           : "
+                  f"{np.mean(nodes)}")
+            print(f"    - Mean number of leaves          : "
+                  f"{np.mean(leaves)}")
+            print(f"    - Mean accuracy on training data : "
+                  f"{np.mean(accuracies)}")
+            print(f"    - Accuracy of the forest on td   : "
+                  f"{self.accuracy(self.explanatory, self.target)}")
 
     def accuracy(self, test_explanatory, test_target):
         """
@@ -119,4 +122,5 @@ class Random_Forest:
         Returns:
             float: Accuracy score.
         """
-        return np.sum(self.predict(test_explanatory) == test_target) / test_target.size
+        return (np.sum(self.predict(test_explanatory) == test_target) /
+                test_target.size)
