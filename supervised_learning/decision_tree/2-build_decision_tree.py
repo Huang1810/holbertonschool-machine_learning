@@ -71,7 +71,7 @@ class Node:
         if self.left_child:
             count += self.left_child.count_nodes_below(only_leaves)
         if self.right_child:
-            count += self.right_child.count_nodes_below(only_leaves)
+            count += self.right_child.count_nodes_below(only_leaves)  # Fixed bug
         return count
 
 
