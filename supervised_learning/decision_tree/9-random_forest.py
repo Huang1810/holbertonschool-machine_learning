@@ -1,91 +1,122 @@
 #!/usr/bin/env python3
 """
-This is the 9-random_forest module, relying on module
-8-build_decision_tree.
+This module provides a Random Forest classifier that uses Decision Trees
+as its base learners. It includes methods for fitting the model to training
+data, making predictions, and calculating accuracy.
 """
 
 import numpy as np
 Decision_Tree = __import__('8-build_decision_tree').Decision_Tree
 
 
-class Random_Forest():
+class Random_Forest:
     """
-    Random forest class, using Decision Trees.
+    Random Forest classifier using Decision Trees as base learners.
+
+    This class implements a Random Forest classifier using Decision Trees
+    as its base learners. It includes methods for fitting the model to training
+    data, making predictions, and calculating accuracy.
+
+    Example Usage:
+        rf = Random_Forest()
+        rf.fit(train_explanatory, train_target)
+        predictions = rf.predict(test_explanatory)
+        acc = rf.accuracy(test_explanatory, test_target)
     """
+
     def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0):
         """
-        Initialize Random Forest with configuration and storage for trees and
-        training data.
+        Initializes a Random_Forest classifier.
+
+        Args:
+            n_trees (int): Number of trees in the forest (default is 100).
+            max_depth (int): Maximum depth of each decision tree (default is 10).
+            min_pop (int): Minimum samples required to split a node (default is 1).
+            seed (int): Seed for random number generation (default is 0).
         """
+        self.numpy_predicts = []
+        self.target = None
+        self.numpy_preds = None
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.min_pop = min_pop
         self.seed = seed
-        self.trees = []  # Store tree objects directly for more flexibility
-        self.explanatory = None  # To store the last trained features
-        self.target = None       # To store the last trained targets
 
     def predict(self, explanatory):
         """
-        Returns an array of the most frequent prediction for each tree in
-        self.trees, based on the given explanatory variables.
+        Predicts the target variable for input data.
+
+        Args:
+            explanatory (numpy.ndarray): Input data for prediction.
+
+        Returns:
+            numpy.ndarray: Predicted target values.
         """
-        if not self.trees:
-            raise ValueError("The model has not been trained yet.")
-        # Compute predictions for each tree
-        predictions = np.array([tree.predict(explanatory)
-                                for tree in self.trees])
+        predictions = []
+
+        # Generate predictions for each tree in the forest
+        for predict_function in self.numpy_preds:
+            predictions.append(predict_function(explanatory))
+
+        predictions = np.array(predictions)
 
         # Calculate the mode (most frequent) prediction for each example
-        mode_predictions = np.apply_along_axis(
-            lambda x: np.bincount(x, minlength=np.max(x) + 1).argmax(),
-            axis=0, arr=predictions)
-        return mode_predictions
+        mode_predictions = []
+        for example_predictions in predictions.T:
+            unique_values, counts = np.unique(example_predictions, return_counts=True)
+            mode_index = np.argmax(counts)
+            mode_predictions.append(unique_values[mode_index])
 
-    def fit(self, explanatory, target, verbose=0):
-        """
-        Fits the random forest to the given training data
-        Ensures target is 2D (if 1D) for compatibility with explanatory data
-        """
-        # Ensure target is 2D (if 1D) for compatibility with explanatory data
-        if target.ndim == 1:
-            target = target.reshape(-1, 1)  # Reshape to (n_samples, 1) if it's 1D
-        
-        self.explanatory = explanatory  # Store the training features
-        self.target = target            # Store the training targets
-        self.trees = [Decision_Tree(max_depth=self.max_depth,
-                                    min_pop=self.min_pop,
-                                    seed=self.seed + i)
-                      for i in range(self.n_trees)]
+        return np.array(mode_predictions)
 
-        # Sequential training of decision trees
-        self.trees = [self._train_tree(tree, explanatory, target)
-                      for tree in self.trees]
+    def fit(self, explanatory, target, n_trees=100, verbose=0):
+        """
+        Fits the Random Forest classifier to training data.
+
+        Args:
+            explanatory (numpy.ndarray): Input features for training.
+            target (numpy.ndarray): Target variable for training.
+            n_trees (int): Number of trees in the forest (default is 100).
+            verbose (int): Verbosity level (0 for silent, 1 for detailed output).
+
+        Returns:
+            None
+        """
+        self.target = target
+        self.explanatory = explanatory
+        self.numpy_preds = []
+        depths = []
+        nodes = []
+        leaves = []
+        accuracies = []
+
+        for i in range(n_trees):
+            # Create a decision tree with an adjusted seed to ensure variation
+            T = Decision_Tree(max_depth=self.max_depth, min_pop=self.min_pop, seed=self.seed + i)
+            T.fit(explanatory, target)
+            self.numpy_preds.append(T.predict)
+            depths.append(T.depth())
+            nodes.append(T.count_nodes())
+            leaves.append(T.count_nodes(only_leaves=True))
+            accuracies.append(T.accuracy(T.explanatory, T.target))
 
         if verbose == 1:
-            depths = [tree.depth() for tree in self.trees]
-            nodes = [tree.count_nodes() for tree in self.trees]
-            leaves = [tree.count_nodes(only_leaves=True)
-                      for tree in self.trees]
-            accuracies = [tree.accuracy(explanatory, target)
-                          for tree in self.trees]
-            print(f"""  Training finished.
-    - Mean depth                     : {np.mean(depths)}
-    - Mean number of nodes           : {np.mean(nodes)}
-    - Mean number of leaves          : {np.mean(leaves)}
-    - Mean accuracy on training data : {np.mean(accuracies)}
-    - Accuracy of the forest on td   : {self.accuracy(explanatory, target)}""")
-
-    def _train_tree(self, tree, explanatory, target):
-        """
-        Fit the tree to the provided data and return it
-        """
-        tree.fit(explanatory, target)
-        return tree
+            print("  Training finished.")
+            print(f"    - Mean depth                     : {np.mean(depths)}")
+            print(f"    - Mean number of nodes           : {np.mean(nodes)}")
+            print(f"    - Mean number of leaves          : {np.mean(leaves)}")
+            print(f"    - Mean accuracy on training data : {np.mean(accuracies)}")
+            print(f"    - Accuracy of the forest on td   : {self.accuracy(self.explanatory, self.target)}")
 
     def accuracy(self, test_explanatory, test_target):
         """
-        Calculates the accuracy of the random forest on the given test data.
+        Calculates the accuracy of the model on test data.
+
+        Args:
+            test_explanatory (numpy.ndarray): Input features for testing.
+            test_target (numpy.ndarray): Target variable for testing.
+
+        Returns:
+            float: Accuracy score.
         """
-        predictions = self.predict(test_explanatory)
-        return np.sum(predictions == test_target) / len(test_target)
+        return np.sum(self.predict(test_explanatory) == test_target) / test_target.size
