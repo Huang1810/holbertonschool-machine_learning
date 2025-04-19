@@ -26,7 +26,8 @@ class Node:
         Returns a visual representation of the subtree rooted at this node.
         """
         p = "root" if self.is_root else "-> node"
-        result = f"{p} [feature={self.feature}, threshold={self.threshold}]\n"
+        result = f"{p} [feature={self.feature}, " \
+                 f"threshold={self.threshold}]\n"
         if self.left_child:
             result += self.left_child_add_prefix(self.left_child.__str__().strip())
         if self.right_child:
@@ -38,10 +39,10 @@ class Node:
         Prefixes the left child subtree for visualization.
         """
         lines = text.split("\n")
-        new_text = "    +--" + lines[0] + "\n"
+        new_text = f"    +--{lines[0]}\n"
         for x in lines[1:]:
             if x:
-                new_text += "    |  " + x + "\n"
+                new_text += f"    |  {x}\n"
         return new_text
 
     def right_child_add_prefix(self, text):
@@ -49,10 +50,10 @@ class Node:
         Prefixes the right child subtree for visualization.
         """
         lines = text.split("\n")
-        new_text = "    +--" + lines[0] + "\n"
+        new_text = f"    +--{lines[0]}\n"
         for x in lines[1:]:
             if x:
-                new_text += "       " + x + "\n"
+                new_text += f"       {x}\n"
         return new_text
 
     def max_depth_below(self):
