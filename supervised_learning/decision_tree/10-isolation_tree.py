@@ -1,168 +1,236 @@
 #!/usr/bin/env python3
 """
-Module implementing Isolation Random Tree for outlier detection using
-Isolation Trees.
-Designed for high-dimensional datasets, it isolates observations based on
-random feature selection and splitting.
+Module for the Isolation_Random_Tree class. It's designed for detecting
+anomalies by isolating data points in a tree structure, where anomalies
+are isolated closer to the root of the tree. It works without prior
+knowledge of the distribution of normal data points.
 """
 import numpy as np
-import random
+Node = __import__('8-build_decision_tree').Node
+Leaf = __import__('8-build_decision_tree').Leaf
 
 
-class Isolation_Random_Tree:
+class Isolation_Random_Tree():
     """
-    A class that implements an Isolation Tree for anomaly detection.
-    An Isolation Tree isolates observations by randomly selecting a feature
-    and then randomly selecting a split value between the maximum and minimum
-    values of the selected feature.
+    Represents an isolation tree used for anomaly detection. It is similar
+    to a decision tree but is used for identifying outliers by isolating
+    samples.
 
     Attributes:
-        max_depth (int): Maximum depth of the tree.
-        seed (int): Random seed for reproducible results.
-        tree (dict): The structure of the tree.
+        rng (np.random.Generator): Random number generator.
+        root (Node): The root node of the isolation tree.
+        explanatory (np.ndarray): The explanatory feature data for fitting.
+        max_depth (int): The maximum depth of the tree.
+        predict (callable): The prediction function of the isolation tree.
+        min_pop (int): The minimum population for splitting during training.
     """
-
-    def __init__(self, max_depth=10, seed=0):
+    def __init__(self, max_depth=10, seed=0, root=None):
         """
-        Initializes the Isolation Random Tree with the specified parameters.
+        Initializes the Isolation_Random_Tree with the given max_depth and
+        seed.
 
         Args:
-            max_depth (int): Maximum depth of the tree.
-            seed (int): Seed for the random number generator.
+            max_depth (int): The maximum depth that the tree can grow to.
+            seed (int): Seed for the random number generator to ensure
+            reproducibility.
+            root (Node, optional): The root node of the tree if starting
+            from an existing node.
         """
+        self.rng = np.random.default_rng(seed)
+        if root:
+            self.root = root
+        else:
+            self.root = Node(is_root=True)
+        self.explanatory = None
         self.max_depth = max_depth
-        self.seed = seed
-        self.tree = {}
+        self.predict = None
+        self.min_pop = 1
 
-    def fit(self, data):
+    def __str__(self):
         """
-        Fits the Isolation Tree to the provided dataset.
-
-        Args:
-            data (numpy.ndarray): The dataset to fit the tree.
-        
-        Returns:
-            None
-        """
-        random.seed(self.seed)
-        self.tree = self._build_tree(data, depth=0)
-
-    def _build_tree(self, data, depth):
-        """
-        Recursively builds the isolation tree.
-
-        Args:
-            data (numpy.ndarray): The dataset to build the tree on.
-            depth (int): Current depth of the tree.
-        
-        Returns:
-            dict: The tree structure.
-        """
-        n_samples, n_features = data.shape
-        if depth >= self.max_depth or n_samples <= 1:
-            return {'depth': depth, 'size': n_samples}
-
-        feature = random.randint(0, n_features - 1)
-        min_val, max_val = data[:, feature].min(), data[:, feature].max()
-        split_value = random.uniform(min_val, max_val)
-
-        left_data = data[data[:, feature] <= split_value]
-        right_data = data[data[:, feature] > split_value]
-
-        return {
-            'feature': feature,
-            'split_value': split_value,
-            'left': self._build_tree(left_data, depth + 1),
-            'right': self._build_tree(right_data, depth + 1),
-        }
-
-    def predict(self, data):
-        """
-        Predicts the anomaly score for each data point.
-
-        Args:
-            data (numpy.ndarray): The dataset to predict anomalies on.
+        Provides a string representation of the entire decision tree.
 
         Returns:
-            numpy.ndarray: The anomaly scores for each sample.
+            str: A string representation of the decision tree.
         """
-        return np.array([self._predict_sample(sample) for sample in data])
-
-    def _predict_sample(self, sample):
-        """
-        Predicts the anomaly score for a single sample.
-
-        Args:
-            sample (numpy.ndarray): The data sample to predict.
-
-        Returns:
-            int: The depth at which the sample is isolated.
-        """
-        node = self.tree
-        depth = 0
-
-        while isinstance(node, dict) and 'feature' in node:
-            feature = node['feature']
-            split_value = node['split_value']
-            if sample[feature] <= split_value:
-                node = node['left']
-            else:
-                node = node['right']
-            depth += 1
-
-        return depth
+        return self.root.__str__()
 
     def depth(self):
         """
-        Returns the maximum depth of the tree.
+        Computes the maximum depth of the tree.
 
         Returns:
-            int: The maximum depth.
+            int: Maximum depth of the tree.
         """
-        return self._get_depth(self.tree)
-
-    def _get_depth(self, node):
-        """
-        Recursively calculates the depth of the tree.
-
-        Args:
-            node (dict): The current node of the tree.
-
-        Returns:
-            int: The depth of the tree.
-        """
-        if isinstance(node, dict) and 'left' in node and 'right' in node:
-            left_depth = self._get_depth(node['left'])
-            right_depth = self._get_depth(node['right'])
-            return max(left_depth, right_depth) + 1
-        return node['depth']
+        return self.root.max_depth_below()
 
     def count_nodes(self, only_leaves=False):
         """
-        Counts the number of nodes in the tree.
+        Counts the nodes in the entire tree, with an option
+        to count only leaves.
 
         Args:
-            only_leaves (bool): If True, counts only the leaves of the tree.
+            only_leaves (bool): Whether to count only leaves.
 
         Returns:
-            int: The number of nodes (or leaves) in the tree.
+            int: Total number of nodes or leaves in the tree.
         """
-        return self._count_nodes(self.tree, only_leaves)
+        return self.root.count_nodes_below(only_leaves=only_leaves)
 
-    def _count_nodes(self, node, only_leaves=False):
+    def get_leaves(self):
         """
-        Recursively counts the number of nodes in the tree.
+        Retrieves all leaves in the decision tree.
+
+        Returns:
+            list: A list of all leaf nodes in the tree.
+        """
+        return self.root.get_leaves_below()
+
+    def update_bounds(self):
+        """
+        Starts the recursive update of bounds from the root.
+        """
+        self.root.update_bounds_below()
+
+    def update_predict(self):
+        """
+        Updates the prediction function for the decision tree.
+        """
+        self.update_bounds()
+        leaves = self.get_leaves()
+        for leaf in leaves:
+            leaf.update_indicator()
+
+        self.predict = lambda A: np.array([self.root.pred(x) for x in A])
+
+    def np_extrema(self, arr):
+        """
+        Returns the minimum and maximum values from the array.
 
         Args:
-            node (dict): The current node of the tree.
-            only_leaves (bool): If True, counts only the leaves.
+            arr (np.ndarray): The input array.
 
         Returns:
-            int: The number of nodes (or leaves) in the tree.
+            tuple: A tuple containing the minimum and maximum values.
         """
-        if isinstance(node, dict):
-            if only_leaves and 'left' not in node and 'right' not in node:
-                return 1
-            return 1 + self._count_nodes(node.get('left', {}), only_leaves) + \
-                self._count_nodes(node.get('right', {}), only_leaves)
-        return 0
+        return np.min(arr), np.max(arr)
+
+    def random_split_criterion(self, node):
+        """
+        Determines a random splitting criterion for a node based
+        on feature values.
+
+        Args:
+            node (Node): The node for which to determine the split.
+
+        Returns:
+            tuple: The chosen feature index and threshold value for
+            the split.
+        """
+        diff = 0
+        while diff == 0:
+            feature = self.rng.integers(0, self.explanatory.shape[1])
+            feature_min, feature_max = self.np_extrema(
+                self.explanatory[:, feature][node.sub_population])
+            diff = feature_max - feature_min
+        x = self.rng.uniform()
+        threshold = (1 - x) * feature_min + x * feature_max
+        return feature, threshold
+
+    def get_leaf_child(self, node, sub_population):
+        """
+        Creates and returns a leaf child node.
+
+        Args:
+            node (Node): The parent node from which the leaf is derived.
+            sub_population (np.ndarray): The subset of indices that belong
+            to this leaf.
+
+        Returns:
+            Leaf: The created leaf child node.
+        """
+        leaf_child = Leaf(value=node.depth + 1)
+        leaf_child.depth = node.depth + 1
+        leaf_child.sub_population = sub_population
+        return leaf_child
+
+    def get_node_child(self, node, sub_population):
+        """
+        Creates a new child node for further splits.
+
+        Args:
+            node (Node): The parent node.
+            sub_population (array): Subset of indices for the new node's
+            population.
+
+        Returns:
+            Node: A new child node initialized for further splitting.
+        """
+        n = Node()
+        n.depth = node.depth + 1
+        n.sub_population = sub_population
+        return n
+
+    def fit_node(self, node):
+        """
+        Recursively fits the isolation tree starting from a given node by
+        isolating samples at each split until the maximum depth is reached
+        or there are no more samples to isolate.
+
+        Args:
+            node (Node): The node to fit.
+        """
+        node.feature, node.threshold = self.random_split_criterion(node)
+
+        above_threshold = self.explanatory[:, node.feature] > node.threshold
+        left_population = node.sub_population & above_threshold
+        right_population = node.sub_population & ~above_threshold
+
+        # Check if the left or right node should be a leaf
+        is_left_leaf = np.any([
+            node.depth >= self.max_depth - 1,
+            np.sum(left_population) <= self.min_pop
+        ])
+
+        # Create left child
+        if is_left_leaf:
+            node.left_child = self.get_leaf_child(node, left_population)
+        else:
+            node.left_child = self.get_node_child(node, left_population)
+            self.fit_node(node.left_child)
+
+        # Check if the right node should be a leaf
+        is_right_leaf = np.any([
+            node.depth >= self.max_depth - 1,
+            np.sum(right_population) <= self.min_pop
+        ])
+
+        # Create right child
+        if is_right_leaf:
+            node.right_child = self.get_leaf_child(node, right_population)
+        else:
+            node.right_child = self.get_node_child(node, right_population)
+            self.fit_node(node.right_child)
+
+    def fit(self, explanatory, verbose=0):
+        """
+        Fits the isolation tree to the given data.
+
+        Args:
+            explanatory (np.ndarray): The data to fit the tree to.
+            verbose (int): Indicates the verbosity level for logging
+            the training process.
+        """
+        self.split_criterion = self.random_split_criterion
+        self.explanatory = explanatory
+        self.root.sub_population = np.ones_like(explanatory.shape[0],
+                                                dtype='bool')
+
+        self.fit_node(self.root)
+        self.update_predict()
+
+        if verbose == 1:
+            print(f"""  Training finished.
+    - Depth                     : { self.depth()       }
+    - Number of nodes           : { self.count_nodes() }
+    - Number of leaves          : { self.count_nodes(only_leaves=True) }""")
