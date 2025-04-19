@@ -45,7 +45,12 @@ class Random_Forest():
     def fit(self, explanatory, target, verbose=0):
         """
         Fits the random forest to the given training data
+        Ensures target is 2D (if 1D) for compatibility with explanatory data
         """
+        # Ensure target is 2D (if 1D) for compatibility with explanatory data
+        if target.ndim == 1:
+            target = target.reshape(-1, 1)  # Reshape to (n_samples, 1) if it's 1D
+        
         self.explanatory = explanatory  # Store the training features
         self.target = target            # Store the training targets
         self.trees = [Decision_Tree(max_depth=self.max_depth,
