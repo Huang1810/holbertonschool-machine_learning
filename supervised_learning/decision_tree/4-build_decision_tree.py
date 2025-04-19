@@ -26,12 +26,14 @@ class Node:
         Returns a visual representation of the subtree rooted at this node.
         """
         p = "root" if self.is_root else "-> node"
-        result = f"{p} [feature={self.feature}, " \
-                 f"threshold={self.threshold}]\n"
+        result = f"{p} [feature={self.feature},\n"
+        result += f"     threshold={self.threshold}]\n"
         if self.left_child:
-            result += self.left_child_add_prefix(self.left_child.__str__().strip())
+            left_str = self.left_child.__str__().strip()
+            result += self.left_child_add_prefix(left_str)
         if self.right_child:
-            result += self.right_child_add_prefix(self.right_child.__str__().strip())
+            right_str = self.right_child.__str__().strip()
+            result += self.right_child_add_prefix(right_str)
         return result
 
     def left_child_add_prefix(self, text):
