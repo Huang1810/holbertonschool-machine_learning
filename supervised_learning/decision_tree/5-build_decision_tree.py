@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-This module defines classes for constructing a decision tree, including
-Node, Leaf, and Decision_Tree, for use in decision-making processes.
+This module defines the classes for building a basic decision tree,
+including Node, Leaf, and Decision_Tree.
 """
 import numpy as np
 
@@ -11,12 +11,12 @@ class Node:
     Represents a node in a decision tree.
 
     Attributes:
-        feature (int): Index of the feature used for splitting the data.
-        threshold (float): The threshold value for the split.
-        left_child (Node): The left child node after the split.
-        right_child (Node): The right child node after the split.
-        is_root (bool): Flag indicating if this node is the root node.
-        depth (int): The depth of this node in the tree.
+        feature (int): Index of the feature used for splitting.
+        threshold (float): Threshold value for the split.
+        left_child (Node): Left child node.
+        right_child (Node): Right child node.
+        is_root (bool): Indicates if the node is the root.
+        depth (int): Depth of the node in the tree.
     """
     def __init__(self, feature=None, threshold=None, left_child=None,
                  right_child=None, is_root=False, depth=0):
@@ -31,62 +31,62 @@ class Node:
 
     def __str__(self):
         """
-        Returns a string representation of the node and its children.
+        Provides a string representation of the node and its children.
 
         Returns:
-            str: A string that describes the subtree rooted at this node.
+            str: A string representation of the subtree rooted at this node.
         """
         p = "root" if self.is_root else "-> node"
-        result = f"{p} [feature={self.feature},\n"
-        result += f"     threshold={self.threshold}]\n"
+        result = f"{p} [feature={self.feature},\
+ threshold={self.threshold}]\n"
         if self.left_child:
-            left_str = self.left_child.__str__().strip()
-            result += self.left_child_add_prefix(left_str)
+            result +=\
+                self.left_child_add_prefix(self.left_child.__str__().strip())
         if self.right_child:
-            right_str = self.right_child.__str__().strip()
-            result += self.right_child_add_prefix(right_str)
+            result +=\
+                self.right_child_add_prefix(self.right_child.__str__().strip())
         return result
 
     def left_child_add_prefix(self, text):
         """
-        Adds a prefix to the left child's subtree representation.
+        Adds a prefix for the left child's subtree representation.
 
         Args:
-            text (str): The subtree string to be modified.
+            text (str): The subtree string.
 
         Returns:
-            str: The modified subtree string with added prefixes for left child.
+            str: The modified subtree string with added prefixes.
         """
         lines = text.split("\n")
-        new_text = f"    +--{lines[0]}\n"
+        new_text = "    +--"+lines[0] + "\n"
         for x in lines[1:]:
             if x:
-                new_text += f"    |  {x}\n"
-        return new_text
+                new_text += ("    |  "+x) + "\n"
+        return (new_text)
 
     def right_child_add_prefix(self, text):
         """
-        Adds a prefix to the right child's subtree representation.
+        Adds a prefix for the right child's subtree representation.
 
         Args:
-            text (str): The subtree string to be modified.
+            text (str): The subtree string.
 
         Returns:
-            str: The modified subtree string with added prefixes for right child.
+            str: The modified subtree string with added prefixes.
         """
         lines = text.split("\n")
-        new_text = f"    +--{lines[0]}\n"
+        new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
             if x:
-                new_text += f"       {x}\n"
+                new_text += ("       " + x) + "\n"
         return new_text
 
     def max_depth_below(self):
         """
-        Calculates the maximum depth of the tree starting from this node.
+        Calculates the maximum depth below this node.
 
         Returns:
-            int: The maximum depth of the subtree rooted at this node.
+            int: Maximum depth below this node.
         """
         max_depth = self.depth
         if self.left_child:
@@ -97,13 +97,13 @@ class Node:
 
     def count_nodes_below(self, only_leaves=False):
         """
-        Counts the number of nodes (or leaves) in the subtree rooted at this node.
+        Counts the nodes below this node, optionally counting only the leaves.
 
         Args:
-            only_leaves (bool): If True, counts only leaf nodes.
+            only_leaves (bool): Whether to count only leaves.
 
         Returns:
-            int: The total number of nodes (or leaves) below this node.
+            int: The count of nodes or leaves below this node.
         """
         if only_leaves:
             if self.is_leaf:
@@ -113,19 +113,17 @@ class Node:
             count = 1  # Count this node
 
         if self.left_child:
-            left_count = self.left_child.count_nodes_below(only_leaves)
-            count += left_count
+            count += self.left_child.count_nodes_below(only_leaves)
         if self.right_child:
-            right_count = self.right_child.count_nodes_below(only_leaves)
-            count += right_count
+            count += self.right_child.count_nodes_below(only_leaves)
         return count
 
     def get_leaves_below(self):
         """
-        Retrieves all the leaf nodes in the subtree rooted at this node.
+        Retrieves all leaf nodes below this node.
 
         Returns:
-            list: A list containing all the leaf nodes in the subtree.
+            list: A list of all leaf nodes below this node.
         """
         leaves = []
         if self.is_leaf:
@@ -139,17 +137,17 @@ class Node:
 
     def update_bounds_below(self):
         """
-        Recursively updates the bounds (upper and lower) for the current node
-        and its descendants. Starts with infinite bounds at the root and
-        adjusts for each child node.
+        Recursively updates bounds for this node and its children.
+        Initializes at root with infinite bounds and adjusts for children
+        based on data.
         """
         if self.is_root:
             self.upper = {0: np.inf}
-            self.lower = {0: -np.inf}
+            self.lower = {0: -1*np.inf}
 
         for child in [self.left_child, self.right_child]:
             if child:
-                # Copy the current node's bounds to each child.
+                # Make a copy of the current node's bounds to each child.
                 child.upper = self.upper.copy()
                 child.lower = self.lower.copy()
 
@@ -158,26 +156,21 @@ class Node:
                 elif child == self.right_child:
                     child.upper[self.feature] = self.threshold
         for child in [self.left_child, self.right_child]:
-            if child:
-                child.update_bounds_below()
+            child.update_bounds_below()
 
     def update_indicator(self):
         """
-        Updates the indicator function for this node based on its bounds.
-        This function determines whether a given set of features meets the
-        node's criteria for splitting.
+        Updates the indicator function for the node based on the bounds.
+        This function defines whether an individual's features meet the
+        node's criteria.
         """
         def is_large_enough(x):
-            return np.array([
-                np.greater_equal(x[:, key], self.lower[key])
-                for key in self.lower.keys()
-            ]).all(axis=0)
+            return np.array([np.greater_equal(x[:, key], self.lower[key])
+                            for key in self.lower.keys()]).all(axis=0)
 
         def is_small_enough(x):
-            return np.array([
-                np.less_equal(x[:, key], self.upper[key])
-                for key in self.upper.keys()
-            ]).all(axis=0)
+            return np.array([np.less_equal(x[:, key], self.upper[key])
+                            for key in self.upper.keys()]).all(axis=0)
 
         self.indicator = lambda x: np.logical_and(is_large_enough(x),
                                                   is_small_enough(x))
@@ -185,11 +178,11 @@ class Node:
 
 class Leaf(Node):
     """
-    Represents a leaf node in the decision tree.
+    Represents a leaf in a decision tree.
 
     Attributes:
         value (any): The value predicted by this leaf.
-        depth (int): Depth of the leaf node in the tree.
+        depth (int): Depth of the leaf in the tree.
     """
     def __init__(self, value, depth=None):
         super().__init__()
@@ -199,61 +192,62 @@ class Leaf(Node):
 
     def __str__(self):
         """
-        Returns a string representation of this leaf node.
+        Provides a string representation of the leaf.
 
         Returns:
-            str: A string that describes the leaf node.
+            str: A string representation of this leaf.
         """
-        return f"-> leaf [value={self.value}] "
+        return (f"-> leaf [value={self.value}] ")
 
     def max_depth_below(self):
         """
-        Returns the depth of this leaf node.
+        Returns the depth of the leaf, as leaves are the end of a branch.
 
         Returns:
-            int: The depth of this leaf node.
+            int: The depth of this leaf.
         """
-        return self.depth reclamation
+        return self.depth
 
     def count_nodes_below(self, only_leaves=False):
         """
-        Counts the leaf nodes under this node.
+        Returns the count of this node as a leaf, regardless of
+        the only_leaves flag.
 
         Args:
-            only_leaves (bool): In the case of a leaf, this flag is ignored
-            as this node is always counted.
+            only_leaves (bool): Ignored in leaf context as a leaf
+            is always counted.
 
         Returns:
-            int: Always returns 1 since a leaf node counts as one.
+            int: Always 1, since a leaf counts as one node.
         """
         return 1
 
     def get_leaves_below(self):
         """
-        Returns a list containing only this leaf node.
+        Since this node is a leaf, it returns itself in a list.
 
         Returns:
-            list: A list containing only this leaf node.
+            list: A list containing only this leaf.
         """
         return [self]
 
     def update_bounds_below(self):
         """
-        Placeholder method for leaves, as they do not have child nodes to update.
+        Leaves do not update bounds, so this is a placeholder.
         """
         pass
 
 
-class Decision_Tree:
+class Decision_Tree():
     """
-    Represents a decision tree classifier.
+    Represents a decision tree.
 
     Attributes:
-        max_depth (int): Maximum depth allowed for the tree.
-        min_pop (int): Minimum number of data points required to split a node.
-        seed (int): Random seed for reproducibility.
-        split_criterion (str): Criterion used for deciding the best split.
-        root (Node): The root node of the decision tree.
+        max_depth (int): Maximum depth of the tree.
+        min_pop (int): Minimum population required to split a node.
+        seed (int): Seed for the random number generator.
+        split_criterion (str): Criterion used for splitting nodes.
+        root (Node): The root node of the tree.
     """
     def __init__(self, max_depth=10, min_pop=1, seed=0,
                  split_criterion="random", root=None):
@@ -268,10 +262,10 @@ class Decision_Tree:
 
     def __str__(self):
         """
-        Returns a string representation of the decision tree.
+        Provides a string representation of the entire decision tree.
 
         Returns:
-            str: A string that represents the entire decision tree.
+            str: A string representation of the decision tree.
         """
         return self.root.__str__()
 
@@ -280,25 +274,26 @@ class Decision_Tree:
         Computes the maximum depth of the tree.
 
         Returns:
-            int: The maximum depth of the tree.
+            int: Maximum depth of the tree.
         """
         return self.root.max_depth_below()
 
     def count_nodes(self, only_leaves=False):
         """
-        Counts the nodes in the entire tree.
+        Counts the nodes in the entire tree, with an option
+        to count only leaves.
 
         Args:
-            only_leaves (bool): If True, counts only the leaf nodes.
+            only_leaves (bool): Whether to count only leaves.
 
         Returns:
-            int: The total number of nodes or leaves in the tree.
+            int: Total number of nodes or leaves in the tree.
         """
         return self.root.count_nodes_below(only_leaves=only_leaves)
 
     def get_leaves(self):
         """
-        Returns a list of all leaf nodes in the tree.
+        Retrieves all leaves in the decision tree.
 
         Returns:
             list: A list of all leaf nodes in the tree.
@@ -307,12 +302,19 @@ class Decision_Tree:
 
     def update_bounds(self):
         """
-        Starts the recursive update of bounds from the root node.
+        Starts the recursive update of bounds from the root.
+        """
+        self.root.update_bounds_below()
+
+    def update_bounds(self):
+        """
+        Updates bounds for all nodes in the tree starting from the root.
         """
         self.root.update_bounds_below()
 
     def update_indicator(self):
         """
-        Updates the indicator functions for all nodes in the tree.
+        Updates the indicator functions for all nodes in the tree starting
+        from the root.
         """
         self.root.update_indicator()
