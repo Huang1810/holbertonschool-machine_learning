@@ -10,17 +10,8 @@ import numpy as np
 class Node:
     """
     Represents an internal node in the decision tree.
-
-    Attributes:
-        feature (int): Feature index used for splitting.
-        threshold (float): Threshold value for the split.
-        left_child (Node): Left subtree.
-        right_child (Node): Right subtree.
-        is_leaf (bool): True if the node is a leaf.
-        is_root (bool): True if the node is the root.
-        sub_population (any): Data at the node (optional).
-        depth (int): Depth of the node in the tree.
     """
+
     def __init__(self, feature=None, threshold=None, left_child=None,
                  right_child=None, is_root=False, depth=0):
         self.feature = feature
@@ -43,16 +34,15 @@ class Node:
     def count_nodes_below(self, only_leaves=False):
         """
         Counts nodes in the subtree rooted at this node.
-
-        Args:
-            only_leaves (bool): If True, count only leaf nodes.
-
-        Returns:
-            int: Number of nodes (or leaves) below this node.
         """
-        left_count = self.left_child.count_nodes_below(only_leaves=only_leaves)
-        right_count = self.right_child.count_nodes_below(only_leaves=only_leaves)
-        return left_count + right_count if only_leaves else 1 + left_count + right_count
+        left_count = self.left_child.count_nodes_below(
+            only_leaves=only_leaves
+        )
+        right_count = self.right_child.count_nodes_below(
+            only_leaves=only_leaves
+        )
+        return (left_count + right_count if only_leaves
+                else 1 + left_count + right_count)
 
     def __str__(self):
         """
@@ -99,21 +89,18 @@ class Node:
     def get_leaves_below(self):
         """
         Recursively collects all leaves under this node.
-
-        Returns:
-            list: List of leaf nodes.
         """
-        return self.left_child.get_leaves_below() + self.right_child.get_leaves_below()
+        return (
+            self.left_child.get_leaves_below() +
+            self.right_child.get_leaves_below()
+        )
 
 
 class Leaf(Node):
     """
     Represents a leaf (terminal) node in the decision tree.
-
-    Attributes:
-        value (any): Predicted value at the leaf.
-        depth (int): Depth of the leaf in the tree.
     """
+
     def __init__(self, value, depth=None):
         super().__init__()
         self.value = value
@@ -136,14 +123,13 @@ class Leaf(Node):
         """
         Returns a formatted string for this leaf node.
         """
-        return f"-> leaf [value={self.value}]"
+        return (
+            f"-> leaf [value={self.value}]"
+        )
 
     def get_leaves_below(self):
         """
         Returns the leaf itself as it's terminal.
-
-        Returns:
-            list: Single-element list containing this leaf.
         """
         return [self]
 
@@ -151,14 +137,8 @@ class Leaf(Node):
 class Decision_Tree:
     """
     Decision Tree classifier class.
-
-    Attributes:
-        max_depth (int): Maximum depth of the tree.
-        min_pop (int): Minimum samples required to split.
-        seed (int): Random seed for reproducibility.
-        split_criterion (str): Splitting strategy ('random', etc.).
-        root (Node): Root of the tree.
     """
+
     def __init__(self, max_depth=10, min_pop=1,
                  seed=0, split_criterion="random", root=None):
         self.rng = np.random.default_rng(seed)
@@ -179,12 +159,6 @@ class Decision_Tree:
     def count_nodes(self, only_leaves=False):
         """
         Counts nodes in the tree.
-
-        Args:
-            only_leaves (bool): If True, count only leaves.
-
-        Returns:
-            int: Total number of nodes or leaf nodes.
         """
         return self.root.count_nodes_below(only_leaves=only_leaves)
 
@@ -197,8 +171,5 @@ class Decision_Tree:
     def get_leaves(self):
         """
         Returns all the leaf nodes in the tree.
-
-        Returns:
-            list: List of leaf nodes.
         """
         return self.root.get_leaves_below()
