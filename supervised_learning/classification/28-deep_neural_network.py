@@ -89,7 +89,6 @@ class DeepNeuralNetwork:
                 exp_Z = np.exp(Z - np.max(Z, axis=0, keepdims=True))
                 A = exp_Z / np.sum(exp_Z, axis=0, keepdims=True)
 
-
             self.__cache[f"A{i}"] = A
 
         return self.__cache[f"A{self.__L}"], self.__cache
@@ -161,7 +160,6 @@ class DeepNeuralNetwork:
                 raise TypeError("step must be an integer")
             if step <= 0 or step > iterations:
                 raise ValueError("step must be positive and <= iterations")
-
 
         costs = []
         count = []
