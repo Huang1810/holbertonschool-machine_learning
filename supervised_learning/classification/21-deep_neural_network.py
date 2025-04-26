@@ -29,7 +29,6 @@ class DeepNeuralNetwork:
         self.__cache = {}
         self.__weights = {}
 
-
         for layer_index in range(1, self.__L + 1):
             layer_size = layers[layer_index - 1]
             prev_layer_size = nx if layer_index == 1 else layers[
