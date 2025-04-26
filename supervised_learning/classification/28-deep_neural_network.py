@@ -78,7 +78,6 @@ class DeepNeuralNetwork:
             Z = np.matmul(self.__weights[f"W{i}"], prev_A)\
                 + self.__weights[f"b{i}"]
 
-
             if i < self.__L:
                 if self.__activation == 'sig':
                     A = 1 / (1 + np.exp(-Z))
@@ -92,7 +91,6 @@ class DeepNeuralNetwork:
 
 
             self.__cache[f"A{i}"] = A
-
 
         return self.__cache[f"A{self.__L}"], self.__cache
 
@@ -109,9 +107,7 @@ class DeepNeuralNetwork:
         """
         output, cache = self.forward_prop(X)
 
-
         prediction = np.eye(output.shape[0])[np.argmax(output, axis=0)].T
-
 
         cost = self.cost(Y, output)
 
@@ -123,7 +119,6 @@ class DeepNeuralNetwork:
         """
         m = Y.shape[1]
         dZ = cache[f"A{self.__L}"] - Y
-
 
         for i in range(self.__L, 0, -1):
 
@@ -139,7 +134,6 @@ class DeepNeuralNetwork:
             else:
                 dZ = np.matmul(
                         self.__weights[f"W{i}"].T, dZ) * (1 - (prev_A ** 2))
-
 
             self.__weights[f"W{i}"] -= alpha * dW
             self.__weights[f"b{i}"] -= alpha * db
@@ -176,12 +170,10 @@ class DeepNeuralNetwork:
 
             A, cache = self.forward_prop(X)
 
-
             if i != iterations:
                 self.gradient_descent(Y, self.cache, alpha)
 
             cost = self.cost(Y, A)
-
 
             costs.append(cost)
             count.append(i)
@@ -189,7 +181,6 @@ class DeepNeuralNetwork:
             if verbose and (i % step == 0 or i == 0 or i == iterations):
 
                 print("Cost after {} iterations: {}".format(i, cost))
-
 
         if graph:
             plt.plot(count, costs, 'b-')
