@@ -22,14 +22,12 @@ class DeepNeuralNetwork:
         if not isinstance(layers, list) or not layers:
             raise TypeError("layers must be a list of positive integers")
 
-
         if not all(map(lambda x: isinstance(x, int) and x > 0, layers)):
             raise TypeError("layers must be a list of positive integers")
 
         self.__L = len(layers)
         self.__cache = {}
         self.__weights = {}
-
 
         for layer_index in range(1, self.__L + 1):
             layer_size = layers[layer_index - 1]
@@ -123,7 +121,6 @@ class DeepNeuralNetwork:
             A_prev = cache[f'A{layer_index-1}']
             A_curr = cache[f'A{layer_index}']
             W = self.__weights[f'W{layer_index}']
-
 
             dZ = dA * A_curr * (1 - A_curr)
             dW = np.dot(dZ, A_prev.T) / m
