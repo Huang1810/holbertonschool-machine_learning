@@ -82,10 +82,10 @@ class NeuralNetwork:
         Calculates the forward propagation of the neural network.
         """
         Z1 = np.dot(self.__W1, X) + self.__b1
-        self.__A1 = 1 / (1 + np.exp(-Z1))  # Sigmoid activation function
+        self.__A1 = 1 / (1 + np.exp(-Z1))
 
         Z2 = np.dot(self.__W2, self.__A1) + self.__b2
-        self.__A2 = 1 / (1 + np.exp(-Z2))  # Sigmoid activation function
+        self.__A2 = 1 / (1 + np.exp(-Z2))
 
         return self.__A1, self.__A2
 
@@ -117,18 +117,17 @@ class NeuralNetwork:
         """
         m = Y.shape[1]
 
-        # Output layer gradients
         dZ2 = A2 - Y
         dW2 = np.dot(dZ2, A1.T) / m
         db2 = np.sum(dZ2, axis=1, keepdims=True) / m
 
-        # Hidden layer gradients
+
         dA1 = np.dot(self.__W2.T, dZ2)
         dZ1 = dA1 * A1 * (1 - A1)
         dW1 = np.dot(dZ1, X.T) / m
         db1 = np.sum(dZ1, axis=1, keepdims=True) / m
 
-        # Update weights and biases
+
         self.__W1 -= alpha * dW1
         self.__b1 -= alpha * db1
         self.__W2 -= alpha * dW2

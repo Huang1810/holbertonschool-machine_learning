@@ -20,11 +20,10 @@ class Neuron:
         if nx < 1:
             raise ValueError("nx must be a positive integer")
 
-        # Weight vector initialized using a random normal distribution
         self.__W = np.random.randn(1, nx)
-        # Bias initialized to 0.
+
         self.__b = 0
-        # Activation output initialized to 0.
+
         self.__A = 0
 
     @property

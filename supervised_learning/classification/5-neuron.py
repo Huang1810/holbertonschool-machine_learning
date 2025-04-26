@@ -20,11 +20,10 @@ class Neuron:
         if nx < 1:
             raise ValueError("nx must be a positive integer")
 
-        # Weight vector initialized using a random normal distribution
         self.__W = np.random.randn(1, nx)
-        # Bias initialized to 0.
+
         self.__b = 0
-        # Activation output initialized to 0.
+
         self.__A = 0
 
     @property
@@ -52,9 +51,9 @@ class Neuron:
         """
         Calculates the forward propagation of the neuron.
         """
-        # Calculate the linear part of the neuron (Z = W.X + b)
+
         Z = np.dot(self.__W, X) + self.__b
-        # Apply the sigmoid activation function
+
         self.__A = 1 / (1 + np.exp(-Z))
         return self.__A
 
@@ -72,7 +71,7 @@ class Neuron:
         Evaluates the neuron's predictions.
         """
         A = self.forward_prop(X)
-        # Convert probabilities to binary output
+
         prediction = (A >= 0.5).astype(int)
         cost = self.cost(Y, A)
         return prediction, cost
@@ -82,10 +81,10 @@ class Neuron:
         Performs one pass of gradient descent on the neuron
         """
         m = Y.shape[1]
-        # Calculate the gradients
+
         dZ = A - Y
         dW = np.dot(dZ, X.T) / m
         db = np.sum(dZ) / m
-        # Update weights and bias
+
         self.__W -= alpha * dW
         self.__b -= alpha * db

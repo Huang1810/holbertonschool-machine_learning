@@ -20,11 +20,10 @@ class Neuron:
         if nx < 1:
             raise ValueError("nx must be a positive integer")
 
-        # Weight vector initialized using a random normal distribution
         self.__W = np.random.randn(1, nx)
-        # Bias initialized to 0.
+
         self.__b = 0
-        # Activation output initialized to 0.
+
         self.__A = 0
 
     @property
@@ -52,9 +51,9 @@ class Neuron:
         """
         Calculates the forward propagation of the neuron.
         """
-        # Calculate the linear part of the neuron (Z = W.X + b)
+
         Z = np.dot(self.__W, X) + self.__b
-        # Apply the sigmoid activation function
+
         self.__A = 1 / (1 + np.exp(-Z))
         return self.__A
 

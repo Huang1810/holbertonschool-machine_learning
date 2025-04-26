@@ -22,15 +22,13 @@ class DeepNeuralNetwork:
         if not isinstance(layers, list) or not layers:
             raise TypeError("layers must be a list of positive integers")
 
-        # Check if all layers are positive integers
         if not all(map(lambda x: isinstance(x, int) and x > 0, layers)):
             raise TypeError("layers must be a list of positive integers")
 
-        self.__L = len(layers)  # number of layers
-        self.__cache = {}  # to store all intermediary values of the network
-        self.__weights = {}  # to hold all weights and biases of the network
+        self.__L = len(layers)
+        self.__cache = {}
+        self.__weights = {}
 
-        # Initialize weights and biases using He et al. method 4 each layer
         for layer_index in range(1, self.__L + 1):
             layer_size = layers[layer_index - 1]
             prev_layer_size = nx if layer_index == 1 else layers[

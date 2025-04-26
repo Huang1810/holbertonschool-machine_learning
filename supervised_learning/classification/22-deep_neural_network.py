@@ -22,15 +22,15 @@ class DeepNeuralNetwork:
         if not isinstance(layers, list) or not layers:
             raise TypeError("layers must be a list of positive integers")
 
-        # Check if all layers are positive integers
+
         if not all(map(lambda x: isinstance(x, int) and x > 0, layers)):
             raise TypeError("layers must be a list of positive integers")
 
-        self.__L = len(layers)  # number of layers
-        self.__cache = {}  # to store all intermediary values of the network
-        self.__weights = {}  # to hold all weights and biases of the network
+        self.__L = len(layers)
+        self.__cache = {}
+        self.__weights = {}
 
-        # Initialize weights and biases using He et al. method 4 each layer
+
         for layer_index in range(1, self.__L + 1):
             layer_size = layers[layer_index - 1]
             prev_layer_size = nx if layer_index == 1 else layers[
@@ -90,7 +90,7 @@ class DeepNeuralNetwork:
         Calculate the cost using the logistic regression 'cross-entropy'
         cost function.
         """
-        m = Y.shape[1]  # number of examples
+        m = Y.shape[1]
         cost = -(1 / m) * np.sum(Y * np.log(A) + (
             1 - Y
             ) * np.log(1.0000001 - A)
@@ -101,10 +101,10 @@ class DeepNeuralNetwork:
         """
         Evaluate the neural network's predictions against the true labels.
         """
-        # Per4m 4ward propagation to get outputs
+
         A, _ = self.forward_prop(X)
-        cost = self.cost(Y, A)  # Compute the cost with the actual labels
-        # Convert probabilities to binary output
+        cost = self.cost(Y, A)
+
         predictions = (A >= 0.5).astype(int)
         return predictions, cost
 
@@ -112,11 +112,11 @@ class DeepNeuralNetwork:
         """
         Per4m one pass of gradient descent on the neural network.
         """
-        m = Y.shape[1]  # Number of examples
-        L = self.__L  # Number of layers
+        m = Y.shape[1]
+        L = self.__L
 
-        A = cache[f'A{L}']  # Output of the last layer
-        # Derivative of cost with respect to A
+        A = cache[f'A{L}']
+
         dA = - (np.divide(Y, A) - np.divide(1 - Y, 1 - A))
 
         for layer_index in reversed(range(1, L + 1)):
@@ -124,15 +124,14 @@ class DeepNeuralNetwork:
             A_curr = cache[f'A{layer_index}']
             W = self.__weights[f'W{layer_index}']
 
-            # Element-wise product assumes sigmoid activation
+
             dZ = dA * A_curr * (1 - A_curr)
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
 
             if layer_index > 1:
-                dA = np.dot(W.T, dZ)  # Prepare dA 4 the next layer
+                dA = np.dot(W.T, dZ)
 
-            # Update weights and biases
             self.__weights[f'W{layer_index}'] -= alpha * dW
             self.__weights[f'b{layer_index}'] -= alpha * db
 

@@ -37,13 +37,12 @@ class DeepNeuralNetwork:
 
         for i in range(self.__L):
             if i == 0:
-                # On layer 0: first layer's length is nx
+
                 prev_layer = nx
             else:
-                # Otherwise we use the previous layer length
+
                 prev_layer = layers[i - 1]
 
-            # He Normal (He-et-al) initialization
             self.__weights[f"W{i + 1}"] = np.random.randn(
                     layers[i], prev_layer) * np.sqrt(2 / prev_layer)
 
@@ -69,17 +68,17 @@ class DeepNeuralNetwork:
         """
         Calculates the forward propagation of the neural network.
         """
-        # Setting up the first input of first layer : X
+
         self.__cache["A0"] = X
 
         for i in range(1, self.__L + 1):
-            # Previous layer activation output, used as input
+
             prev_A = self.__cache[f"A{i - 1}"]
 
             Z = np.matmul(self.__weights[f"W{i}"], prev_A)\
                 + self.__weights[f"b{i}"]
 
-            # Apply activation function to all layers except the last one
+
             if i < self.__L:
                 if self.__activation == 'sig':
                     A = 1 / (1 + np.exp(-Z))
@@ -87,14 +86,14 @@ class DeepNeuralNetwork:
                     A = np.tanh(Z)
                 activation = 1 / (1 + np.exp(-Z))
             else:
-                # For the output layer, use softmax activation
+
                 exp_Z = np.exp(Z - np.max(Z, axis=0, keepdims=True))
                 A = exp_Z / np.sum(exp_Z, axis=0, keepdims=True)
 
-            # Store activation in cache
+
             self.__cache[f"A{i}"] = A
 
-        # The output of the network is in A{layer} (the last output)
+
         return self.__cache[f"A{self.__L}"], self.__cache
 
     def cost(self, Y, A):
@@ -110,10 +109,10 @@ class DeepNeuralNetwork:
         """
         output, cache = self.forward_prop(X)
 
-        # Similar trick as in one_hot_encode()
+
         prediction = np.eye(output.shape[0])[np.argmax(output, axis=0)].T
 
-        # Cost of activated output on "output" layer
+
         cost = self.cost(Y, output)
 
         return prediction, cost
@@ -125,23 +124,23 @@ class DeepNeuralNetwork:
         m = Y.shape[1]
         dZ = cache[f"A{self.__L}"] - Y
 
-        # In reverse layer order :
+
         for i in range(self.__L, 0, -1):
-            # Previous layer activation output
+
             prev_A = cache[f"A{i - 1}"]
 
             dW = (1 / m) * np.matmul(dZ, prev_A.T)
             db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
 
             if self.__activation == 'sig':
-                # Prepare the next layer's gradient calculation
+
                 dZ = np.matmul(
                         self.__weights[f"W{i}"].T, dZ) * prev_A * (1 - prev_A)
             else:
                 dZ = np.matmul(
                         self.__weights[f"W{i}"].T, dZ) * (1 - (prev_A ** 2))
 
-            # Updating parameters using the gradients and the learning rate
+
             self.__weights[f"W{i}"] -= alpha * dW
             self.__weights[f"b{i}"] -= alpha * db
 
@@ -169,30 +168,29 @@ class DeepNeuralNetwork:
             if step <= 0 or step > iterations:
                 raise ValueError("step must be positive and <= iterations")
 
-        # list to store cost /iter
+
         costs = []
         count = []
 
         for i in range(iterations + 1):
-            # run forward propagation
+
             A, cache = self.forward_prop(X)
 
-            # run gradient descent for all iterations except the last one
+
             if i != iterations:
                 self.gradient_descent(Y, self.cache, alpha)
 
             cost = self.cost(Y, A)
 
-            # store cost for graph
+
             costs.append(cost)
             count.append(i)
 
-            # verbose TRUE, every step + first and last iteration
             if verbose and (i % step == 0 or i == 0 or i == iterations):
-                # run evaluate
+
                 print("Cost after {} iterations: {}".format(i, cost))
 
-        # graph TRUE after training complete
+
         if graph:
             plt.plot(count, costs, 'b-')
             plt.xlabel('iteration')
