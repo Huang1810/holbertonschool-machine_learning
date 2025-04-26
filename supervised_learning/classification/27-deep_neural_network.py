@@ -81,7 +81,6 @@ class DeepNeuralNetwork:
             self.__cache[f"A{i}"] = activation
 
         return self.__cache[f"A{self.__L}"], self.__cache
-
     def cost(self, Y, A):
         """
         Calculates the cost of the model using logistic regression.
@@ -98,11 +97,9 @@ class DeepNeuralNetwork:
 
         prediction = np.eye(output.shape[0])[np.argmax(output, axis=0)].T
 
-
         cost = self.cost(Y, output)
 
         return prediction, cost
-
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
         Calculates one pass of gradient descent on the network.
@@ -118,10 +115,8 @@ class DeepNeuralNetwork:
             dW = (1 / m) * np.matmul(dZ, prev_A.T)
             db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
 
-
             dZ = np.matmul(
                     self.__weights[f"W{i}"].T, dZ) * prev_A * (1 - prev_A)
-
 
             self.__weights[f"W{i}"] -= alpha * dW
             self.__weights[f"b{i}"] -= alpha * db
@@ -131,7 +126,6 @@ class DeepNeuralNetwork:
         """
         Method to train deep neural network
         """
-
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
@@ -158,7 +152,6 @@ class DeepNeuralNetwork:
 
             A, cache = self.forward_prop(X)
 
-
             if i != iterations:
                 self.gradient_descent(Y, self.cache, alpha)
 
@@ -167,7 +160,6 @@ class DeepNeuralNetwork:
 
             costs.append(cost)
             count.append(i)
-
 
             if verbose and (i % step == 0 or i == 0 or i == iterations):
 
