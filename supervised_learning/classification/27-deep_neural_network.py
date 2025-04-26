@@ -77,10 +77,10 @@ class DeepNeuralNetwork:
                 exp_Z = np.exp(Z - np.max(Z, axis=0, keepdims=True))
                 activation = exp_Z / np.sum(exp_Z, axis=0, keepdims=True)
 
-
             self.__cache[f"A{i}"] = activation
 
         return self.__cache[f"A{self.__L}"], self.__cache
+
     def cost(self, Y, A):
         """
         Calculates the cost of the model using logistic regression.
@@ -94,19 +94,18 @@ class DeepNeuralNetwork:
         """
         output, cache = self.forward_prop(X)
 
-
         prediction = np.eye(output.shape[0])[np.argmax(output, axis=0)].T
 
         cost = self.cost(Y, output)
 
         return prediction, cost
+
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
         Calculates one pass of gradient descent on the network.
         """
         m = Y.shape[1]
         dZ = cache[f"A{self.__L}"] - Y
-
 
         for i in range(self.__L, 0, -1):
 
@@ -144,7 +143,6 @@ class DeepNeuralNetwork:
             if step <= 0 or step > iterations:
                 raise ValueError("step must be positive and <= iterations")
 
-
         costs = []
         count = []
 
@@ -157,14 +155,12 @@ class DeepNeuralNetwork:
 
             cost = self.cost(Y, A)
 
-
             costs.append(cost)
             count.append(i)
 
             if verbose and (i % step == 0 or i == 0 or i == iterations):
 
                 print("Cost after {} iterations: {}".format(i, cost))
-
 
         if graph:
             plt.plot(count, costs, 'b-')
