@@ -39,7 +39,6 @@ class DeepNeuralNetwork:
 
                 prev_layer = layers[i - 1]
 
-
             self.__weights[f"W{i + 1}"] = np.random.randn(
                     layers[i], prev_layer) * np.sqrt(2 / prev_layer)
 
@@ -71,7 +70,6 @@ class DeepNeuralNetwork:
             Z = np.matmul(self.__weights[f"W{i}"], prev_A)\
                 + self.__weights[f"b{i}"]
 
-
             if i < self.__L:
                 activation = 1 / (1 + np.exp(-Z))
             else:
@@ -81,7 +79,6 @@ class DeepNeuralNetwork:
 
 
             self.__cache[f"A{i}"] = activation
-
 
         return self.__cache[f"A{self.__L}"], self.__cache
 

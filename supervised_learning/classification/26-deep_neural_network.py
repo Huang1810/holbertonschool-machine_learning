@@ -31,7 +31,6 @@ class DeepNeuralNetwork:
         self.__cache = {}
         self.__weights = {}
 
-
         for layer_index in range(1, self.__L + 1):
             layer_size = layers[layer_index - 1]
             prev_layer_size = nx if layer_index == 1 else layers[
@@ -132,7 +131,6 @@ class DeepNeuralNetwork:
             if layer_index > 1:
                 dA = np.dot(W.T, dZ)
 
-
             self.__weights[f'W{layer_index}'] -= alpha * dW
             self.__weights[f'b{layer_index}'] -= alpha * db
 
@@ -164,7 +162,6 @@ class DeepNeuralNetwork:
             if step <= 0 or step > iterations:
                 raise ValueError("step must be positive and <= iterations")
 
-
         costs = []
         count = []
 
@@ -176,17 +173,13 @@ class DeepNeuralNetwork:
             if i != iterations:
                 self.gradient_descent(Y, self.cache, alpha)
 
-
                 cost = self.cost(Y, A)
-
 
                 costs.append(cost)
                 count.append(i)
 
-
                 if verbose and (i % step == 0 or i == 0 or i == iterations):
                     print("Cost after {} iterations: {}".format(i, cost))
-
 
         if graph:
             plt.plot(count, costs, 'b-')
@@ -194,7 +187,6 @@ class DeepNeuralNetwork:
             plt.ylabel('cost')
             plt.title('Training Cost')
             plt.show()
-
 
         return self.evaluate(X, Y)
 
