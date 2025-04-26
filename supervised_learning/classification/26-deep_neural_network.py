@@ -143,7 +143,6 @@ class DeepNeuralNetwork:
         descent.
         """
 
-
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
@@ -168,7 +167,6 @@ class DeepNeuralNetwork:
         for i in range(iterations + 1):
 
             A, cache = self.forward_prop(X)
-
 
             if i != iterations:
                 self.gradient_descent(Y, self.cache, alpha)
