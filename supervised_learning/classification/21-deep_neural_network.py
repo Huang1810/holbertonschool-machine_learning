@@ -122,14 +122,12 @@ class DeepNeuralNetwork:
             A_curr = cache[f'A{layer_index}']
             W = self.__weights[f'W{layer_index}']
 
-
             dZ = dA * A_curr * (1 - A_curr)
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
 
             if layer_index > 1:
                 dA = np.dot(W.T, dZ)
-
 
             self.__weights[f'W{layer_index}'] -= alpha * dW
             self.__weights[f'b{layer_index}'] -= alpha * db
