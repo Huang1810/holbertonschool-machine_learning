@@ -3,6 +3,7 @@
 
 import numpy as np
 
+
 def normalization_constants(X):
     """
     Calculae the normalization constants (mean and standard deviation)
