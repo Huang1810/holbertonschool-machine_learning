@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-
+"""
+This module provides a function to compute normalization constants
+(mean and standard deviation) for a given NumPy matrix.
+"""
 
 import numpy as np
 
 
 def normalization_constants(X):
     """
-    Calculae the normalization constants (mean and standard deviation)
+    Calculate the normalization constants (mean and standard deviation)
     of a matrix
     """
     mean = np.mean(X, axis=0)
