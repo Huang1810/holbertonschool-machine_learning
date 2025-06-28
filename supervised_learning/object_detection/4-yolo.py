@@ -106,8 +106,8 @@ class Yolo:
             anchors = self.anchors[anchor_idx]
 
             # Calculate box width and height
-            box_w = np.exp(box_wh[..., 0:1]) * anchors[:, 0:1] / input_width
-            box_h = np.exp(box_wh[..., 1:2]) * anchors[:, 1:2] / input_height
+            box_w = (np.exp(box_wh[..., 0:1]) * anchors[:, 0:1]) / input_width
+            box_h = (np.exp(box_wh[..., 1:2]) * anchors[:, 1:2]) / input_height
 
             # Convert to corner coordinates
             box_x1 = (box_x - box_w / 2) * image_width
@@ -146,9 +146,8 @@ class Yolo:
         box_classes = []
         box_scores = []
 
-        for box, confidence, class_prob in zip(boxes,
-                                               box_confidences,
-                                               box_class_probs):
+        for box, confidence, class_prob in zip(
+                boxes, box_confidences, box_class_probs):
             # Calculate box scores
             scores = confidence * class_prob
             max_scores = np.max(scores, axis=-1)
@@ -221,10 +220,10 @@ class Yolo:
                 h = np.maximum(0, y2 - y1)
                 inter = w * h
 
-                area1 = (cls_boxes[0, 2] - cls_boxes[0, 0]) * \
-                        (cls_boxes[0, 3] - cls_boxes[0, 1])
-                area2 = (cls_boxes[1:, 2] - cls_boxes[1:, 0]) * \
-                        (cls_boxes[1:, 3] - cls_boxes[1:, 1])
+                area1 = ((cls_boxes[0, 2] - cls_boxes[0, 0]) *
+                         (cls_boxes[0, 3] - cls_boxes[0, 1]))
+                area2 = ((cls_boxes[1:, 2] - cls_boxes[1:, 0]) *
+                         (cls_boxes[1:, 3] - cls_boxes[1:, 1]))
                 union = area1 + area2 - inter
 
                 iou = inter / union
