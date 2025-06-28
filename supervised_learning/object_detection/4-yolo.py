@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Yolo class with methods for loading images and processing outputs for object detection.
+Yolo class for object detection with image loading and output
+processing.
 """
 
 import keras as K
@@ -15,14 +16,15 @@ class Yolo:
     """
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
         """
-        Initialize the Yolo class with the specified parameters.
+        Initialize Yolo with model and parameters.
 
         Args:
-            model_path (str): Path to the Darknet Keras model.
-            classes_path (str): Path to the file containing class names.
-            class_t (float): Box score threshold for initial filtering.
+            model_path (str): Path to Darknet Keras model.
+            classes_path (str): Path to file with class names.
+            class_t (float): Box score threshold for filtering.
             nms_t (float): IOU threshold for non-max suppression.
-            anchors (numpy.ndarray): Anchor boxes with shape (outputs, anchor_boxes, 2).
+            anchors (numpy.ndarray): Anchor boxes, shape
+                (outputs, anchor_boxes, 2).
         """
         self.model = K.models.load_model(model_path)
         self.class_names = self._load_class_names(classes_path)
@@ -32,10 +34,10 @@ class Yolo:
 
     def _load_class_names(self, classes_path):
         """
-        Load class names from a file.
+        Load class names from file.
 
         Args:
-            classes_path (str): Path to the file containing class names.
+            classes_path (str): Path to file with class names.
 
         Returns:
             list: List of class names.
@@ -46,18 +48,22 @@ class Yolo:
 
     def process_outputs(self, outputs, image_size):
         """
-        Process Darknet model outputs to bounding boxes.
+        Process model outputs to bounding boxes.
 
         Args:
-            outputs (list): List of numpy.ndarrays containing predictions with shape
-                           (grid_height, grid_width, anchor_boxes, 4 + 1 + classes).
-            image_size (numpy.ndarray): Original image size [image_height, image_width].
+            outputs (list): List of numpy.ndarrays, shape
+                           (grid_height, grid_width, anchor_boxes,
+                           4 + 1 + classes).
+            image_size (numpy.ndarray): Image size [height, width].
 
         Returns:
             tuple: (boxes, box_confidences, box_class_probs)
-                - boxes: List of numpy.ndarrays of shape (grid_height, grid_width, anchor_boxes, 4)
-                - box_confidences: List of numpy.ndarrays of shape (grid_height, grid_width, anchor_boxes, 1)
-                - box_class_probs: List of numpy.ndarrays of shape (grid_height, grid_width, anchor_boxes, classes)
+                - boxes: List of arrays, shape
+                  (grid_height, grid_width, anchor_boxes, 4)
+                - box_confidences: List of arrays, shape
+                  (grid_height, grid_width, anchor_boxes, 1)
+                - box_class_probs: List of arrays, shape
+                  (grid_height, grid_width, anchor_boxes, classes)
         """
         boxes = []
         box_confidences = []
@@ -84,12 +90,12 @@ class Yolo:
             # Get grid dimensions
             grid_x = np.tile(np.arange(grid_width), (grid_height, 1))
             grid_x = np.expand_dims(grid_x, axis=-1)
-            grid_x = np.expand_dims(grid_x, axis=-1)  # Add extra dimension for broadcasting
+            grid_x = np.expand_dims(grid_x, axis=-1)
             grid_x = np.tile(grid_x, (1, 1, anchor_boxes, 1))
 
             grid_y = np.tile(np.arange(grid_height), (grid_width, 1)).T
             grid_y = np.expand_dims(grid_y, axis=-1)
-            grid_y = np.expand_dims(grid_y, axis=-1)  # Add extra dimension for broadcasting
+            grid_y = np.expand_dims(grid_y, axis=-1)
             grid_y = np.tile(grid_y, (1, 1, anchor_boxes, 1))
 
             # Calculate box coordinates
@@ -121,27 +127,29 @@ class Yolo:
 
     def filter_boxes(self, boxes, box_confidences, box_class_probs):
         """
-        Filter boxes based on confidence threshold.
+        Filter boxes by confidence threshold.
 
         Args:
-            boxes (list): List of numpy.ndarrays of shape
+            boxes (list): List of arrays, shape
                           (grid_height, grid_width, anchor_boxes, 4).
-            box_confidences (list): List of numpy.ndarrays of shape
+            box_confidences (list): List of arrays, shape
                                     (grid_height, grid_width, anchor_boxes, 1).
-            box_class_probs (list): List of numpy.ndarrays of shape
-                                    (grid_height, grid_width, anchor_boxes, classes).
+            box_class_probs (list): List of arrays, shape
+                                    (grid_height, grid_width, anchor_boxes,
+                                    classes).
 
         Returns:
             tuple: (filtered_boxes, box_classes, box_scores)
-                - filtered_boxes: numpy.ndarray of shape (?, 4) containing filtered bounding boxes.
-                - box_classes: numpy.ndarray of shape (?) containing class indices.
-                - box_scores: numpy.ndarray of shape (?) containing box scores.
+                - filtered_boxes: Array of shape (?, 4) with filtered boxes.
+                - box_classes: Array of shape (?) with class indices.
+                - box_scores: Array of shape (?) with box scores.
         """
         filtered_boxes = []
         box_classes = []
         box_scores = []
 
-        for box, confidence, class_prob in zip(boxes, box_confidences, box_class_probs):
+        for box, confidence, class_prob in zip(boxes, box_confidences,
+                                               box_class_probs):
             # Calculate box scores
             scores = confidence * class_prob
             max_scores = np.max(scores, axis=-1)
@@ -162,18 +170,19 @@ class Yolo:
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
         """
-        Apply Non-max Suppression to filtered boxes.
+        Apply non-max suppression to filtered boxes.
 
         Args:
-            filtered_boxes (numpy.ndarray): Shape (?, 4) containing filtered bounding boxes.
-            box_classes (numpy.ndarray): Shape (?) containing class indices.
-            box_scores (numpy.ndarray): Shape (?) containing box scores.
+            filtered_boxes (numpy.ndarray): Shape (?, 4) with filtered boxes.
+            box_classes (numpy.ndarray): Shape (?) with class indices.
+            box_scores (numpy.ndarray): Shape (?) with box scores.
 
         Returns:
-            tuple: (box_predictions, predicted_box_classes, predicted_box_scores)
-                - box_predictions: numpy.ndarray of shape (?, 4) containing predicted bounding boxes.
-                - predicted_box_classes: numpy.ndarray of shape (?) containing predicted class indices.
-                - predicted_box_scores: numpy.ndarray of shape (?) containing predicted box scores.
+            tuple: (box_predictions, predicted_box_classes,
+                    predicted_box_scores)
+                - box_predictions: Array of shape (?, 4) with predicted boxes.
+                - predicted_box_classes: Array of shape (?) with class indices.
+                - predicted_box_scores: Array of shape (?) with box scores.
         """
         unique_classes = np.unique(box_classes)
         box_predictions = []
@@ -233,12 +242,12 @@ class Yolo:
         Load images from a folder path.
 
         Args:
-            folder_path (str): Path to the folder containing images.
+            folder_path (str): Path to folder with images.
 
         Returns:
             tuple: (images, image_paths)
                 - images: List of images as numpy.ndarrays.
-                - image_paths: List of paths to the images.
+                - image_paths: List of image file paths.
         """
         images = []
         image_paths = []
