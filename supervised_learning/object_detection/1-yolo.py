@@ -9,6 +9,7 @@ import numpy as np
 
 class Yolo:
     """
+    Yolo class Sumary:
     Yolo class for object detection using YOLOv3 algorithm.
     """
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
@@ -82,15 +83,17 @@ class Yolo:
             # Get grid dimensions
             grid_x = np.tile(np.arange(grid_width), (grid_height, 1))
             grid_x = np.expand_dims(grid_x, axis=-1)
-            grid_x = np.tile(grid_x, (1, 1, anchor_boxes))
+            grid_x = np.expand_dims(grid_x, axis=-1)  # Add extra dimension for broadcasting
+            grid_x = np.tile(grid_x, (1, 1, anchor_boxes, 1))
             
             grid_y = np.tile(np.arange(grid_height), (grid_width, 1)).T
             grid_y = np.expand_dims(grid_y, axis=-1)
-            grid_y = np.tile(grid_y, (1, 1, anchor_boxes))
+            grid_y = np.expand_dims(grid_y, axis=-1)  # Add extra dimension for broadcasting
+            grid_y = np.tile(grid_y, (1, 1, anchor_boxes, 1))
             
             # Calculate box coordinates
             box_x = (box_xy[..., 0:1] + grid_x) / grid_width
-            box_y12 = (box_xy[..., 1:2] + grid_y) / grid_height
+            box_y = (box_xy[..., 1:2] + grid_y) / grid_height
             
             # Get appropriate anchors
             stride = input_width // grid_width
