@@ -5,26 +5,24 @@ import numpy as np
 
 def pca(X, var=0.95):
     """
-    Performs PCA on a dataset to reduce its dimensionality
-    while retaining a specified fraction of variance.
+    Performs PCA on a dataset while retaining a given fraction of variance.
 
     Args:
-        X (np.ndarray): shape (n, d), centered dataset
-        var (float): fraction of variance to preserve
+        X (np.ndarray): shape (n, d), centered dataset (zero mean)
+        var (float): desired fraction of variance to retain (0 < var <= 1)
 
     Returns:
-        W (np.ndarray): shape (d, nd), projection matrix
+        np.ndarray: shape (d, nd), weight matrix with nd principal components
     """
     # Perform SVD
     u, s, vh = np.linalg.svd(X, full_matrices=False)
 
-    # Compute explained variance from singular values
+    # Compute explained variance ratio
     explained_variance = (s ** 2) / np.sum(s ** 2)
     cumulative_variance = np.cumsum(explained_variance)
 
-    # Get number of components needed to reach the desired variance
-    r = np.argmax(cumulative_variance >= var) + 1
+    # Number of components to retain desired variance
+    r = np.searchsorted(cumulative_variance, var) + 1
 
-    # Construct the weight matrix
-    W = vh[:r].T  # Shape: (d, r)
-    return W
+    # Return projection matrix (d, r)
+    return vh[:r].T
