@@ -3,25 +3,33 @@
 
 import numpy as np
 
-
 def pca(X, var=0.95):
     """
-    Function that perfoms PCA on a data set
+    Performs PCA on a dataset to reduce its dimensionality while retaining a given variance.
+    
     Args:
-        X: numpy.ndarray of shape (n, d) where
-           n is the number of data points
-           d is the number of dimensions in each point
-           all dimensions have a mean of 0 across all data points
-        var: fraction of the variance that the PCA transformation
-             should maintain
-    Returns: weights matrix, W, that maintains var fraction of X‘s
-             original variance. W is a ndarray (d, nd)
-             nd is the new dimensionality o the transformed X
+        X: numpy.ndarray of shape (n, d)
+           - n: number of data points
+           - d: number of dimensions/features
+           Assumes X is already centered (zero mean).
+        var: float
+            - Fraction of variance to retain (between 0 and 1)
+
+    Returns:
+        W: numpy.ndarray of shape (d, nd)
+           - Weight matrix for projecting the data
+           - nd is the number of principal components selected
     """
-    # U singular_v, Sigma singular_v, Vh right singular_v
-    u, Sigma, vh = np.linalg.svd(X, full_matrices=False)
-    cumulative_var = np.cumsum(Sigma) / np.sum(Sigma)
-    r = (np.argwhere(cumulative_var >= var))[0, 0]
-    w = vh.T
-    wr = w[:, :r + 1]
-    return wr
+    # Perform Singular Value Decomposition
+    u, s, vh = np.linalg.svd(X, full_matrices=False)
+
+    # Compute explained variance
+    explained_variance = (s ** 2) / np.sum(s ** 2)
+    cumulative_variance = np.cumsum(explained_variance)
+
+    # Find the number of components to retain enough variance
+    r = np.searchsorted(cumulative_variance, var) + 1
+
+    # Return the first r principal components
+    W = vh[:r].T
+    return W
