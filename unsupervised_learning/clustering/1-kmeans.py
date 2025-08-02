@@ -59,9 +59,11 @@ def kmeans(X, k, max_iters=1000):
     for iteration in range(max_iters):
         prev_centroids = np.copy(centroids)
 
+        # Calculate distances from each point to centroids
         distances = np.linalg.norm(X[:, np.newaxis] - centroids, axis=2)
         labels = np.argmin(distances, axis=1)
 
+        # Update centroids by averaging the points in each cluster
         for i in range(k):
             cluster_points = X[labels == i]
             if cluster_points.size == 0:
@@ -69,6 +71,7 @@ def kmeans(X, k, max_iters=1000):
             else:
                 centroids[i] = np.mean(cluster_points, axis=0)
 
+        # Check for convergence
         if np.allclose(centroids, prev_centroids):
             break
 
