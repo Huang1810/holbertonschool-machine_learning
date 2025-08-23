@@ -8,8 +8,8 @@ def autoencoder(input_dims, filters, latent_dims):
 
         - input_dims (tuple): Dimensions of the model input (H, W, C).
         - filters (list): Number of filters for each conv layer in the encoder.
-        - latent_dims (tuple): Dimensions of the latent space representation (H, W, C).
-       
+        - latent_dims (tuple): Dimensions of the latent space representation
+                (H, W, C).
          Returns: encoder, decoder, auto
             - encoder (Model): Encoder model.
             - decoder (Model): Decoder model.
