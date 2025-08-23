@@ -21,7 +21,7 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
     x = input_layer
     for nodes in hidden_layers:
         x = layers.Dense(nodes, activation='relu')(x)
-    latent = layers.Dense(latent_dims, activation='relu')(x)
+    latent = layers.Dense(latent_dims, activation='linear')(x)  # linear latent layer
     
     encoder = models.Model(inputs=input_layer, outputs=latent, name="encoder")
     
