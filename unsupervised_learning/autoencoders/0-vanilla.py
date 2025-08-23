@@ -2,6 +2,7 @@
 """ Vanilla autoencoder """
 import tensorflow.keras as keras
 
+
 def autoencoder(input_dims, hidden_layers, latent_dims):
     """ creates a vanilla autoencoder
 
