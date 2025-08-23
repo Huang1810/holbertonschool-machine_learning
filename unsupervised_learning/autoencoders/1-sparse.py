@@ -25,7 +25,7 @@ def autoencoder(input_dims, hidden_layers, latent_dims, lambtha):
     x = inputs
     for nodes in hidden_layers:
         x = keras.layers.Dense(nodes, activation='relu')(x)
-    
+
     # Latent layer with L1 regularization for sparsity
     latent = keras.layers.Dense(
         latent_dims,
