@@ -31,6 +31,7 @@ class WGAN_GP(keras.Model):
         self.beta1 = 0.3
         self.beta2 = 0.9
 
+        # Generator: maximize D(G(z)) → minimize -D(G(z))
         self.generator.loss = lambda logits: -tf.reduce_mean(logits)
         self.generator.optimizer = keras.optimizers.Adam(
             learning_rate=self.lr, beta_1=self.beta1, beta_2=self.beta2
@@ -38,6 +39,7 @@ class WGAN_GP(keras.Model):
         self.generator.compile(optimizer=self.generator.optimizer,
                                loss=self.generator.loss)
 
+        # Discriminator: maximize D(real) - D(fake)
         self.discriminator.loss = lambda real, fake: tf.reduce_mean(fake) - tf.reduce_mean(real)
         self.discriminator.optimizer = keras.optimizers.Adam(
             learning_rate=self.lr, beta_1=self.beta1, beta_2=self.beta2
