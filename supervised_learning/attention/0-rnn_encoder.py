@@ -1,46 +1,70 @@
 #!/usr/bin/env python3
 """
 0-rnn_encoder.py
-
-This module implements the RNN encoder for supervised learning tasks
-using attention mechanisms. It defines the RNNEncoder class which
-encodes input sequences into context vectors suitable for decoders.
+RNN Encoder module for supervised learning sequence models.
 """
+
 import tensorflow as tf
 
 
 class RNNEncoder(tf.keras.layers.Layer):
-    def __init__(self, vocab, embedding, units, batch):
+    """
+    RNNEncoder class for encoding sequences using a recurrent neural network.
+
+    This encoder uses an embedding layer followed by a GRU layer to
+    convert input sequences of token indices into context-rich hidden states.
+
+    Attributes:
+        vocab_size (int): Size of the input vocabulary.
+        embedding_dim (int): Dimensionality of the embedding layer.
+        enc_units (int): Number of units in the GRU layer.
+        batch_sz (int): Batch size for training.
+        embedding (tf.keras.layers.Embedding): Embedding layer.
+        gru (tf.keras.layers.GRU): GRU layer for sequence encoding.
+    """
+
+    def __init__(self, vocab_size, embedding_dim, enc_units, batch_sz):
+        """
+        Initialize the RNNEncoder.
+
+        Args:
+            vocab_size (int): Size of the input vocabulary.
+            embedding_dim (int): Dimensionality of the embedding layer.
+            enc_units (int): Number of units in the GRU layer.
+            batch_sz (int): Batch size for training.
+        """
         super(RNNEncoder, self).__init__()
-        self.batch = batch
-        self.units = units
-
-        # Embedding layer
-        self.embedding = tf.keras.layers.Embedding(
-            input_dim=vocab,
-            output_dim=embedding
-        )
-
-        # GRU layer (with glorot_uniform initializer)
+        self.batch_sz = batch_sz
+        self.enc_units = enc_units
+        self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
         self.gru = tf.keras.layers.GRU(
-            units,
+            self.enc_units,
             return_sequences=True,
             return_state=True,
-            recurrent_initializer="glorot_uniform"
+            recurrent_initializer='glorot_uniform'
         )
 
-    def initialize_hidden_state(self):
-        """Initializes hidden state as zeros"""
-        return tf.zeros((self.batch, self.units))
+    def call(self, x, hidden):
+        """
+        Forward pass of the RNNEncoder.
 
-    def call(self, x, initial):
-        """
-        x: tensor of shape (batch, input_seq_len)
-        initial: tensor of shape (batch, units)
+        Args:
+            x (tf.Tensor): Input tensor of shape (batch_size, seq_len).
+            hidden (tf.Tensor): Initial hidden state of shape (batch_size, enc_units).
+
         Returns:
-            outputs: (batch, input_seq_len, units)
-            hidden: (batch, units)
+            output (tf.Tensor): All GRU outputs for each timestep, shape (batch_size, seq_len, enc_units).
+            state (tf.Tensor): Final hidden state, shape (batch_size, enc_units).
         """
-        x = self.embedding(x)  # (batch, input_seq_len, embedding_dim)
-        outputs, hidden = self.gru(x, initial_state=initial)
-        return outputs, hidden
+        x = self.embedding(x)
+        output, state = self.gru(x, initial_state=hidden)
+        return output, state
+
+    def initialize_hidden_state(self):
+        """
+        Initialize the hidden state to zeros.
+
+        Returns:
+            tf.Tensor: Zero-initialized hidden state of shape (batch_sz, enc_units).
+        """
+        return tf.zeros((self.batch_sz, self.enc_units))
