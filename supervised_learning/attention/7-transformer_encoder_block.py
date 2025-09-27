@@ -1,59 +1,56 @@
 #!/usr/bin/env python3
 """
-Transformer Encoder Block
+EncoderBlock module for creating an encoder block for a transformer using
+TensorFlow.
 """
-import tensorflow as tf
-from tensorflow.keras import layers
 
-# Import MultiHeadAttention
+import tensorflow as tf
 MultiHeadAttention = __import__('6-multihead_attention').MultiHeadAttention
 
 
-class EncoderBlock(layers.Layer):
-    """Encoder Block for Transformer"""
+class EncoderBlock(tf.keras.layers.Layer):
+    """
+    EncoderBlock class that creates an encoder block for a transformer.
+    """
 
     def __init__(self, dm, h, hidden, drop_rate=0.1):
         """
-        Class constructor
-        Args:
-            dm: int, model dimensionality
-            h: int, number of attention heads
-            hidden: int, number of hidden units in fully connected layer
-            drop_rate: float, dropout rate
+        Initializes the EncoderBlock.
         """
         super(EncoderBlock, self).__init__()
 
+        # Multi-head attention layer
         self.mha = MultiHeadAttention(dm, h)
 
-        self.dense_hidden = layers.Dense(hidden, activation="relu")
-        self.dense_output = layers.Dense(dm)
+        # Fully connected layers
+        self.dense_hidden = tf.keras.layers.Dense(hidden, activation='relu')
+        self.dense_output = tf.keras.layers.Dense(dm)
 
-        self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
-        self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
+        # Layer normalization layers
+        self.layernorm1 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
+        self.layernorm2 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
 
-        self.dropout1 = layers.Dropout(drop_rate)
-        self.dropout2 = layers.Dropout(drop_rate)
+        # Dropout layers
+        self.dropout1 = tf.keras.layers.Dropout(drop_rate)
+        self.dropout2 = tf.keras.layers.Dropout(drop_rate)
 
     def call(self, x, training, mask=None):
         """
-        Forward pass for encoder block
-        Args:
-            x: tensor of shape (batch, input_seq_len, dm)
-            training: boolean, whether in training mode
-            mask: optional mask
-        Returns:
-            tensor of shape (batch, input_seq_len, dm)
+        Forward pass through the encoder block.
         """
-        # Multi-head attention
-        attn_output, _ = self.mha(x, x, x, mask)  # self-attention
+        # Multi-head attention layer
+        attn_output, _ = self.mha(x, x, x, mask)
+
+        # Dropout and add & normalize for the first sublayer
         attn_output = self.dropout1(attn_output, training=training)
-        out1 = self.layernorm1(x + attn_output)  # residual connection + norm
+        out1 = self.layernorm1(x + attn_output)
 
-        # Feed-forward network
-        ffn_output = self.dense_hidden(out1)
-        ffn_output = self.dense_output(ffn_output)
+        # Feed forward network
+        dense_output = self.dense_hidden(out1)
+        ffn_output = self.dense_output(dense_output)
+
+        # Dropout and add & normalize for the second sublayer
         ffn_output = self.dropout2(ffn_output, training=training)
-
-        out2 = self.layernorm2(out1 + ffn_output)  # residual connection + norm
+        out2 = self.layernorm2(out1 + ffn_output)
 
         return out2

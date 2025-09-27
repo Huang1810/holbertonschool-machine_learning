@@ -1,30 +1,22 @@
 #!/usr/bin/env python3
+"""
+Calculates the positional encoding for a transformer.
+"""
+
 import numpy as np
 
 
 def positional_encoding(max_seq_len, dm):
     """
-    Calculates the positional encoding for a transformer
-
-    Args:
-        max_seq_len: maximum sequence length (int)
-        dm: model depth (int)
-
-    Returns:
-        numpy.ndarray of shape (max_seq_len, dm) with positional encodings
+    Calculates the positional encoding for a transformer.
     """
-    # Create position indices (max_seq_len, 1)
-    pos = np.arange(max_seq_len)[:, np.newaxis]
+    # Initialize the positional encoding matrix with zeros
+    position = np.arange(max_seq_len)[:, np.newaxis]
+    div_term = np.exp(np.arange(0, dm, 2) * -(np.log(10000.0) / dm))
 
-    # Create dimension indices (1, dm)
-    i = np.arange(dm)[np.newaxis, :]
+    # Calculate the positional encoding using sine and cosine functions
+    pos_encoding = np.zeros((max_seq_len, dm))
+    pos_encoding[:, 0::2] = np.sin(position * div_term)
+    pos_encoding[:, 1::2] = np.cos(position * div_term)
 
-    # Compute the angle rates
-    angle_rates = pos / np.power(10000, (2 * (i // 2)) / np.float32(dm))
-
-    # Apply sin to even indices, cos to odd indices
-    PE = np.zeros((max_seq_len, dm))
-    PE[:, 0::2] = np.sin(angle_rates[:, 0::2])
-    PE[:, 1::2] = np.cos(angle_rates[:, 1::2])
-
-    return PE
+    return pos_encoding
