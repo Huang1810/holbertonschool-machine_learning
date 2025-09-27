@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+"""
+0-rnn_encoder.py
+
+This module implements the RNN encoder for supervised learning tasks
+using attention mechanisms. It defines the RNNEncoder class which
+encodes input sequences into context vectors suitable for decoders.
+"""
 import tensorflow as tf
 
 
