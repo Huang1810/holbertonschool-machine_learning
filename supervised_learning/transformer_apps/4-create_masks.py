@@ -5,6 +5,7 @@ Function to create all masks for training/validation in a Transformer.
 
 import tensorflow as tf
 
+
 def create_padding_mask(seq):
     """
     Creates a padding mask for a given sequence.
