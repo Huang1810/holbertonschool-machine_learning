@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Module to let the trained agent play an episode on FrozenLake
-without modifying load_frozen_lake.
+using the existing 0-load_env.py without modifying it.
 """
 
 import numpy as np
@@ -66,6 +66,7 @@ def play(env, Q, max_steps=100):
         final_board += row_str
         if r != nrow - 1:
             final_board += "\n"
+    final_board += "\n"  # Add final newline to match desired output
     rendered_outputs.append(final_board)
 
     return total_rewards, rendered_outputs
