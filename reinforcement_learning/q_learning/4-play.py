@@ -29,7 +29,7 @@ def play(env, Q, max_steps=100):
         next_state, reward, done, truncated, _ = env.step(action)
         total_rewards += reward
 
-        # Build board string manually
+        # Build board string for current state
         board_str = ""
         for r in range(nrow):
             row_str = ""
@@ -44,7 +44,7 @@ def play(env, Q, max_steps=100):
             if r != nrow - 1:
                 board_str += "\n"
 
-        # Append action just taken
+        # Append action immediately after the board
         board_str += f"\n  ({ACTION_NAMES[action]})"
         rendered_outputs.append(board_str)
 
@@ -66,7 +66,6 @@ def play(env, Q, max_steps=100):
         final_board += row_str
         if r != nrow - 1:
             final_board += "\n"
-    final_board += "\n"  # Add final newline to match desired output
     rendered_outputs.append(final_board)
 
     return total_rewards, rendered_outputs
