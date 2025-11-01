@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Module that allows a trained Q-learning agent to play FrozenLake
+Module to let the trained agent play an episode on FrozenLake.
 """
 
 import numpy as np
@@ -9,37 +9,29 @@ ACTION_NAMES = ["Left", "Down", "Right", "Up"]
 
 def play(env, Q, max_steps=100):
     """
-    Lets the trained agent play an episode using the Q-table.
-
-    Args:
-        env: FrozenLakeEnv instance
-        Q: numpy.ndarray containing the Q-table
-        max_steps: maximum number of steps in the episode
-
-    Returns:
-        total_rewards: total reward earned in the episode
-        rendered_outputs: list of strings showing the board state at each step
+    Plays an episode using the trained Q-table and returns
+    total rewards and rendered board states with actions.
     """
     state, _ = env.reset()
-    done = False
     total_rewards = 0
     rendered_outputs = []
 
-    for _ in range(max_steps):
-        # Always exploit
-        action = np.argmax(Q[state])
-
-        # Render board
+    for step in range(max_steps):
+        # Render board as string
         board = env.render()
-        # Add action taken if this is not the first step
-        if rendered_outputs:
+
+        # Append the last action taken except on the first step
+        if step > 0:
             board += f"\n  ({ACTION_NAMES[action]})"
         rendered_outputs.append(board)
 
-        # Take step
-        new_state, reward, done, truncated, info = env.step(action)
+        # Choose best action (exploit)
+        action = np.argmax(Q[state])
+
+        # Take the action
+        next_state, reward, done, truncated, _ = env.step(action)
         total_rewards += reward
-        state = new_state
+        state = next_state
 
         if done or truncated:
             break
