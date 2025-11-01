@@ -5,6 +5,7 @@ Module that allows a trained Q-learning agent to play FrozenLake
 
 import numpy as np
 
+ACTION_NAMES = ["Left", "Down", "Right", "Up"]
 
 def play(env, Q, max_steps=100):
     """
@@ -25,22 +26,25 @@ def play(env, Q, max_steps=100):
     rendered_outputs = []
 
     for _ in range(max_steps):
-        # Always exploit: choose best action based on Q-table
+        # Always exploit
         action = np.argmax(Q[state])
 
-        # Render the current environment and store the string output
-        rendered_outputs.append(env.render())
+        # Render board
+        board = env.render()
+        # Add action taken if this is not the first step
+        if rendered_outputs:
+            board += f"\n  ({ACTION_NAMES[action]})"
+        rendered_outputs.append(board)
 
-        # Take the chosen action
+        # Take step
         new_state, reward, done, truncated, info = env.step(action)
-
-        state = new_state
         total_rewards += reward
+        state = new_state
 
         if done or truncated:
             break
 
-    # Ensure the final state is rendered
+    # Render final state
     rendered_outputs.append(env.render())
 
     return total_rewards, rendered_outputs
