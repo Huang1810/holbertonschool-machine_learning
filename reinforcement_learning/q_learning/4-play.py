@@ -20,10 +20,16 @@ def play(env, Q, max_steps=100):
     rendered_outputs = []
 
     nrow, ncol = env.unwrapped.desc.shape
-    action = None  # Initialize previous action
 
-    for step in range(max_steps):
-        # Build the board string manually
+    for _ in range(max_steps):
+        # Choose best action (exploit Q-table)
+        action = np.argmax(Q[state])
+
+        # Take the action
+        next_state, reward, done, truncated, _ = env.step(action)
+        total_rewards += reward
+
+        # Build board string manually
         board_str = ""
         for r in range(nrow):
             row_str = ""
@@ -38,24 +44,15 @@ def play(env, Q, max_steps=100):
             if r != nrow - 1:
                 board_str += "\n"
 
-        # Append previous action after the board if defined
-        if action is not None:
-            board_str += f"\n  ({ACTION_NAMES[action]})"
-
+        # Append action just taken
+        board_str += f"\n  ({ACTION_NAMES[action]})"
         rendered_outputs.append(board_str)
 
-        # Choose best action (exploit)
-        action = np.argmax(Q[state])
-
-        # Take the action
-        next_state, reward, done, truncated, _ = env.step(action)
-        total_rewards += reward
         state = next_state
-
         if done or truncated:
             break
 
-    # Render final state (no action appended)
+    # Render final state (without appending an action)
     final_board = ""
     for r in range(nrow):
         row_str = ""
