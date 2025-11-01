@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Module to let the trained agent play an episode on FrozenLake
-with proper board rendering and action display.
+without modifying load_frozen_lake.
 """
 
 import numpy as np
@@ -10,8 +10,10 @@ ACTION_NAMES = ["Left", "Down", "Right", "Up"]
 
 def play(env, Q, max_steps=100):
     """
-    Plays an episode using the Q-table, returns total rewards
-    and a list of rendered outputs with quoted current positions.
+    Plays an episode using the trained Q-table and returns:
+        - total_rewards: total reward earned in the episode
+        - rendered_outputs: list of strings showing the board state
+          at each step with the agent position quoted and action shown
     """
     state, _ = env.reset()
     total_rewards = 0
@@ -20,7 +22,7 @@ def play(env, Q, max_steps=100):
     nrow, ncol = env.unwrapped.desc.shape
 
     for step in range(max_steps):
-        # Build board string
+        # Build the board string manually
         board_str = ""
         for r in range(nrow):
             row_str = ""
@@ -41,7 +43,7 @@ def play(env, Q, max_steps=100):
 
         rendered_outputs.append(board_str)
 
-        # Choose best action (exploit)
+        # Always exploit: pick best action from Q-table
         action = np.argmax(Q[state])
 
         # Take action
