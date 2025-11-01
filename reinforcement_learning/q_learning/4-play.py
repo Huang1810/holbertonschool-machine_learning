@@ -25,10 +25,6 @@ def play(env, Q, max_steps=100):
         # Choose best action (exploit Q-table)
         action = np.argmax(Q[state])
 
-        # Take the action
-        next_state, reward, done, truncated, _ = env.step(action)
-        total_rewards += reward
-
         # Build board string for current state
         board_str = ""
         for r in range(nrow):
@@ -48,7 +44,11 @@ def play(env, Q, max_steps=100):
         board_str += f"\n  ({ACTION_NAMES[action]})"
         rendered_outputs.append(board_str)
 
+        # Take the action
+        next_state, reward, done, truncated, _ = env.step(action)
+        total_rewards += reward
         state = next_state
+
         if done or truncated:
             break
 
@@ -66,6 +66,7 @@ def play(env, Q, max_steps=100):
         final_board += row_str
         if r != nrow - 1:
             final_board += "\n"
+    final_board += "\n"  # Add final newline
     rendered_outputs.append(final_board)
 
     return total_rewards, rendered_outputs
