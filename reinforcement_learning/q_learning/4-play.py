@@ -1,29 +1,46 @@
 #!/usr/bin/env python3
 """
-Module that loads the pre-made FrozenLake environment from gymnasium
+Module that allows a trained Q-learning agent to play FrozenLake
 """
 
-import gymnasium as gym
+import numpy as np
 
 
-def load_frozen_lake(desc=None, map_name=None, is_slippery=False):
+def play(env, Q, max_steps=100):
     """
-    Loads the FrozenLake environment from gymnasium.
+    Lets the trained agent play an episode using the Q-table.
 
     Args:
-        desc: list of lists containing a custom description of the map,
-              or None to use a pre-made or random map.
-        map_name: string of a pre-made map name (e.g., '4x4', '8x8'),
-                  or None for a random map.
-        is_slippery: boolean determining if the ice is slippery.
+        env: FrozenLakeEnv instance
+        Q: numpy.ndarray containing the Q-table
+        max_steps: maximum number of steps in the episode
 
     Returns:
-        The loaded FrozenLake environment.
+        total_rewards: total reward earned in the episode
+        rendered_outputs: list of strings showing the board state at each step
     """
-    env = gym.make(
-        "FrozenLake-v1",
-        desc=desc,
-        map_name=map_name,
-        is_slippery=is_slippery
-    )
-    return env
+    state, _ = env.reset()
+    done = False
+    total_rewards = 0
+    rendered_outputs = []
+
+    for _ in range(max_steps):
+        # Always exploit: choose best action based on Q-table
+        action = np.argmax(Q[state])
+
+        # Render the current environment and store the string output
+        rendered_outputs.append(env.render())
+
+        # Take the chosen action
+        new_state, reward, done, truncated, info = env.step(action)
+
+        state = new_state
+        total_rewards += reward
+
+        if done or truncated:
+            break
+
+    # Ensure the final state is rendered
+    rendered_outputs.append(env.render())
+
+    return total_rewards, rendered_outputs
