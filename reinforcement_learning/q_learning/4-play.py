@@ -10,16 +10,17 @@ ACTION_NAMES = ["Left", "Down", "Right", "Up"]
 
 def play(env, Q, max_steps=100):
     """
-    Plays an episode using the trained Q-table and returns:
+    Plays an episode using the Q-table and returns:
         - total_rewards: total reward earned in the episode
         - rendered_outputs: list of strings showing the board state
-          at each step with the agent position quoted and action shown
+          at each step with the agent position quoted and actions shown
     """
     state, _ = env.reset()
     total_rewards = 0
     rendered_outputs = []
 
     nrow, ncol = env.unwrapped.desc.shape
+    action = None  # Initialize previous action
 
     for step in range(max_steps):
         # Build the board string manually
@@ -37,16 +38,16 @@ def play(env, Q, max_steps=100):
             if r != nrow - 1:
                 board_str += "\n"
 
-        # Append previous action except for first step
-        if step > 0:
+        # Append previous action after the board if defined
+        if action is not None:
             board_str += f"\n  ({ACTION_NAMES[action]})"
 
         rendered_outputs.append(board_str)
 
-        # Always exploit: pick best action from Q-table
+        # Choose best action (exploit)
         action = np.argmax(Q[state])
 
-        # Take action
+        # Take the action
         next_state, reward, done, truncated, _ = env.step(action)
         total_rewards += reward
         state = next_state
@@ -54,7 +55,7 @@ def play(env, Q, max_steps=100):
         if done or truncated:
             break
 
-    # Render final state
+    # Render final state (no action appended)
     final_board = ""
     for r in range(nrow):
         row_str = ""
