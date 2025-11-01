@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Module that initializes the Q-table for a FrozenLake environment
+Module that initializes the Q-table
 """
 
 import numpy as np
@@ -8,15 +8,13 @@ import numpy as np
 
 def q_init(env):
     """
-    Initializes the Q-table for a given FrozenLake environment.
+    Initializes the Q-table.
 
     Args:
-        env: the FrozenLakeEnv instance
+        env: FrozenLakeEnv instance
 
     Returns:
-        A numpy.ndarray of zeros with shape (number of states, number of actions)
+        Q-table as a NumPy array of zeros
     """
-    n_states = env.observation_space.n
-    n_actions = env.action_space.n
-    Q = np.zeros((n_states, n_actions))
-    return Q
+    return np.zeros((env.observation_space.n,
+                     env.action_space.n))
