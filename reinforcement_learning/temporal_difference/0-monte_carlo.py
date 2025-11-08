@@ -1,28 +1,29 @@
 #!/usr/bin/env python3
+"""
+Monte Carlo method for estimating the value function of a policy
+"""
 import numpy as np
 
 
 def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99):
     """
-    Performs the Monte Carlo algorithm to estimate the value of each state.
-
+    Performs the Monte Carlo algorithm
     Args:
-        env: the environment instance
-        V: numpy.ndarray of shape (s,) containing the value estimate
-        policy: function that takes in a state and returns the next action to take
-        episodes: total number of episodes to train over
-        max_steps: maximum number of steps per episode
-        alpha: learning rate
-        gamma: discount rate
-
+        env: the environment to use
+        V: the initial value function
+        policy: the policy to follow
+        episodes: the number of episodes to run
+        max_steps: the maximum number of steps per episode
+        alpha: the learning rate
+        gamma: the discount factor
     Returns:
-        V: the updated value estimate
+        V, the updated value estimate
     """
     for _ in range(episodes):
-        # Generate one episode following the policy
         state, _ = env.reset()
         episode = []
 
+        # Generate an episode
         for _ in range(max_steps):
             action = policy(state)
             next_state, reward, terminated, truncated, _ = env.step(action)
@@ -31,11 +32,13 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0
                 break
             state = next_state
 
-        # Compute returns (G) for each state in the episode
+        # Calculate returns and update V
         G = 0
+        visited_states = set()
         for state, reward in reversed(episode):
             G = reward + gamma * G
-            # Incremental mean update rule
-            V[state] = V[state] + alpha * (G - V[state])
+            if state not in visited_states:
+                visited_states.add(state)
+                V[state] += alpha * (G - V[state])
 
     return V
