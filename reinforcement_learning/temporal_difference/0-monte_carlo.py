@@ -32,13 +32,10 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0
                 break
             state = next_state
 
-        # Calculate returns and update V
+        # Compute returns and update all visited states (every-visit MC)
         G = 0
-        visited_states = set()
         for state, reward in reversed(episode):
             G = reward + gamma * G
-            if state not in visited_states:
-                visited_states.add(state)
-                V[state] += alpha * (G - V[state])
+            V[state] += alpha * (G - V[state])
 
     return V
