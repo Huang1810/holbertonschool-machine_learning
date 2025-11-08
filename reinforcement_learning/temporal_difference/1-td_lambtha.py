@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+"""
+TD(λ) algorithm implementation for Temporal Difference learning.
+
+This module contains the function td_lambtha, which performs the
+Temporal Difference learning with eligibility traces (TD(λ)) to
+estimate the value function for a given policy in a reinforcement
+learning environment.
+"""
 import numpy as np
 
 
