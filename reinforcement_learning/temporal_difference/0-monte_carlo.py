@@ -5,7 +5,9 @@ Monte Carlo method for estimating the value function of a policy
 import numpy as np
 
 
-def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99):
+def monte_carlo(
+    env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99
+):
     """
     Performs the Monte Carlo algorithm
     Args:
@@ -19,12 +21,11 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0
     Returns:
         V, the updated value estimate
     """
-    for _ in range(episodes):
-        state, _ = env.reset()
+    for ep in range(episodes):
+        state = env.reset()[0]
         episode = []
 
-        # Generate an episode
-        for _ in range(max_steps):
+        for step in range(max_steps):
             action = policy(state)
             next_state, reward, terminated, truncated, _ = env.step(action)
             episode.append((state, reward))
@@ -32,10 +33,12 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0
                 break
             state = next_state
 
-        # Compute returns and update all visited states (every-visit MC)
         G = 0
+        episode = np.array(episode, dtype=int)
+
         for state, reward in reversed(episode):
             G = reward + gamma * G
-            V[state] += alpha * (G - V[state])
 
+            if state not in episode[:ep, 0]:
+                V[state] += alpha * (G - V[state])
     return V
