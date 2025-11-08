@@ -33,46 +33,42 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
     n_states, n_actions = Q.shape
 
     for _ in range(episodes):
-        # Reset environment and eligibility traces
         state, _ = env.reset()
         E = np.zeros((n_states, n_actions))
 
-        # Choose initial action using epsilon-greedy
+        # Initial action (epsilon-greedy)
         if np.random.uniform() < epsilon:
             action = env.action_space.sample()
         else:
             action = np.argmax(Q[state])
 
         for _ in range(max_steps):
-            # Perform the chosen action
             next_state, reward, terminated, truncated, _ = env.step(action)
 
-            # Choose next action using epsilon-greedy
+            # Next action (epsilon-greedy)
             if np.random.uniform() < epsilon:
                 next_action = env.action_space.sample()
             else:
                 next_action = np.argmax(Q[next_state])
 
-            # Compute TD error
+            # Temporal difference error
             td_error = (reward + gamma * Q[next_state, next_action]
                         - Q[state, action])
 
-            # Update eligibility trace for (state, action)
-            E[state, action] += 1
+            # Update eligibility trace (replace method)
+            E[state, action] = 1
 
             # Update Q-values and decay traces
             Q += alpha * td_error * E
             E *= gamma * lambtha
 
-            # If episode ends, break
             if terminated or truncated:
                 break
 
-            # Move to next step
             state = next_state
             action = next_action
 
-        # Decay epsilon after each episode
-        epsilon = max(min_epsilon, epsilon * (1 - epsilon_decay))
+        # Exponential epsilon decay
+        epsilon = min_epsilon + (epsilon - min_epsilon) * np.exp(-epsilon_decay)
 
     return Q
