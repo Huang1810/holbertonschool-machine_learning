@@ -9,66 +9,65 @@ action-value function (Q-table) in reinforcement learning.
 import numpy as np
 
 
-def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
-                  alpha=0.1, gamma=0.99, epsilon=1,
-                  min_epsilon=0.1, epsilon_decay=0.05):
+def epsilon_greedy(Q, state, epsilon):
     """
-    Performs the SARSA(λ) algorithm.
+    Determine action using epsilon-greedy policy.
+    """
+    if np.random.uniform(0, 1) > epsilon:
+        return np.argmax(Q[state, :])
+    else:
+        return np.random.randint(0, Q.shape[1])
 
+
+def sarsa_lambtha(
+    env, Q, lambtha, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99,
+    epsilon=1, min_epsilon=0.1, epsilon_decay=0.05
+):
+    """
+    Implements the SARSA(λ) algorithm.
     Args:
-        env: the environment instance
-        Q: numpy.ndarray of shape (s, a) containing the Q table
-        lambtha: eligibility trace factor (λ)
-        episodes: total number of episodes to train over
-        max_steps: maximum number of steps per episode
-        alpha: learning rate
-        gamma: discount rate
-        epsilon: initial epsilon for epsilon-greedy
-        min_epsilon: minimum epsilon value
-        epsilon_decay: decay rate for epsilon per episode
-
+        env: The environment to train on.
+        Q: Initial action-value function.
+        lambtha: The lambda parameter for eligibility traces.
+        episodes: Number of episodes to train.
+        max_steps: Maximum steps per episode.
+        alpha: Learning rate.
+        gamma: Discount factor.
+        epsilon: Initial exploration rate.
+        min_epsilon: Minimum exploration rate.
+        epsilon_decay: Decay rate for epsilon.
     Returns:
-        Q: the updated Q table
+        Q, the updated Q table
     """
-    n_states, n_actions = Q.shape
+    initial_epsilon = epsilon
 
-    for _ in range(episodes):
+    for ep in range(episodes):
         state, _ = env.reset()
-        E = np.zeros((n_states, n_actions))
+        action = epsilon_greedy(Q, state, epsilon)
 
-        # Initial action (epsilon-greedy)
-        if np.random.uniform() < epsilon:
-            action = env.action_space.sample()
-        else:
-            action = np.argmax(Q[state])
+        eligibility = np.zeros_like(Q)
 
-        for _ in range(max_steps):
+        for step in range(max_steps):
             next_state, reward, terminated, truncated, _ = env.step(action)
+            next_action = epsilon_greedy(Q, next_state, epsilon)
 
-            # Next action (epsilon-greedy)
-            if np.random.uniform() < epsilon:
-                next_action = env.action_space.sample()
-            else:
-                next_action = np.argmax(Q[next_state])
+            TD_error = (
+                reward + gamma * Q[next_state, next_action] - Q[state, action]
+            )
 
-            # Temporal difference error
-            td_error = (reward + gamma * Q[next_state, next_action]
-                        - Q[state, action])
+            eligibility *= gamma * lambtha
+            eligibility[state, action] += 1
 
-            # Update eligibility trace (replace method)
-            E[state, action] = 1
+            Q += alpha * TD_error * eligibility
 
-            # Update Q-values and decay traces
-            Q += alpha * td_error * E
-            E *= gamma * lambtha
+            state, action = next_state, next_action
 
             if terminated or truncated:
                 break
 
-            state = next_state
-            action = next_action
-
-        # Exponential epsilon decay
-        epsilon = min_epsilon + (epsilon - min_epsilon) * np.exp(-epsilon_decay)
+        epsilon = (
+            min_epsilon + (initial_epsilon - min_epsilon)
+            * np.exp(-epsilon_decay * ep)
+        )
 
     return Q
