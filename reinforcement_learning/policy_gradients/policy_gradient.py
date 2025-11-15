@@ -1,47 +1,62 @@
 #!/usr/bin/env python3
+"""
+Policy gradient module.
+
+This module implements:
+- policy: a softmax policy function
+- policy_gradient: Monte Carlo REINFORCE policy gradient
+
+Both functions operate on NumPy arrays and are used to train
+a policy-gradient agent for environments like CartPole-v1.
+"""
+
 import numpy as np
 
 
 def policy(state, weight):
     """
-    Computes the softmax policy.
-    state: numpy array (1, n) or (n,)
-    weight: numpy array (n, m)
-    Return: softmax probability of each action
+    Compute the softmax policy for a given state and weight matrix.
+
+    Args:
+        state (numpy.ndarray): Observation/state of shape (4,) or (1, 4).
+        weight (numpy.ndarray): Weight matrix of shape (4, 2).
+
+    Returns:
+        numpy.ndarray: Softmax probability distribution over actions
+                       with shape (1, 2).
     """
-    # Ensure row vector
     state = np.array(state).reshape(1, -1)
 
-    # Compute logits
     z = np.dot(state, weight)
-
-    # Softmax (numerically stable)
     exp = np.exp(z - np.max(z))
     softmax = exp / np.sum(exp, axis=1, keepdims=True)
+
     return softmax
 
 
 def policy_gradient(state, weight):
     """
-    Computes Monte-Carlo policy gradient for a single state.
-    state: vector (n,)
-    weight: matrix (n, m)
-    Return: (action, gradient)
+    Compute the Monte-Carlo REINFORCE policy gradient for a single step.
+
+    Args:
+        state (numpy.ndarray): Environment observation/state (size 4).
+        weight (numpy.ndarray): Weight matrix of shape (4, 2).
+
+    Returns:
+        tuple:
+            - int: the sampled action (0 or 1)
+            - numpy.ndarray: gradient of the log-policy w.r.t. weights
+                             with shape (4, 2)
     """
-    # Get policy probabilities
     probs = policy(state, weight).flatten()
 
-    # Sample an action using the probabilities
     action = np.random.choice(len(probs), p=probs)
 
-    # One-hot encode action
     action_one_hot = np.zeros_like(probs)
     action_one_hot[action] = 1
 
-    # Reshape state into column vector
     s = np.array(state).reshape(-1, 1)
 
-    # Gradient of log π(a|s)
     grad = np.dot(s, (action_one_hot - probs).reshape(1, -1))
 
     return action, grad
