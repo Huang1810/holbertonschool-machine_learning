@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Where can I learn Python?
+Returns the list of schools having a specific topic
 """
 
 

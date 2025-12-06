@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Change school topics
+Change all school topics
 """
 
 

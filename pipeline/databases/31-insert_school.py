@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Insert a document in Python
+Insert a document in a collection
 """
 
 
