@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Hue
+This module provides a function to change the hue of an image.
 """
 import tensorflow as tf
 
