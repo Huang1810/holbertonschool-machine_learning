@@ -1,5 +1,18 @@
 🎓 Holberton School – Machine Learning Specialization
-Machine Learning Overview
+
+
+
+
+
+
+
+<img width="1400" height="589" alt="0_TE7zYYuJYHnocn1k" src="https://github.com/user-attachments/assets/fa06226b-53d7-4058-a79c-5940f85f09d8" />
+
+
+
+
+
+
 
 📘 About This Repository
 This repository represents my complete journey through the Machine Learning specialization at Holberton School.
