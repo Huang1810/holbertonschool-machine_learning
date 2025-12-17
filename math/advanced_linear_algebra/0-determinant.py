@@ -22,7 +22,7 @@ def determinant(matrix):
     """
     Calculates the determinant of a matrix.
     """
-    # test if matrix is a list of lists
+    # test if matrix is a list of list
     if not isinstance(matrix, list) or len(matrix) == 0:
         raise TypeError("matrix must be a list of lists")
     for sub_list in matrix:

@@ -37,7 +37,7 @@ def determinant(matrix):
     if len(matrix) != len(matrix[0]):
         raise ValueError("matrix must be a square matrix")
 
-    # Base cases for small matrices
+    # Base cases for small matrice
     if len(matrix) == 1:
         return matrix[0][0]
     elif len(matrix) == 2:
