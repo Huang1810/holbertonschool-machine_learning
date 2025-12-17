@@ -1,4 +1,4 @@
-Holberton School – Machine Learning Specialization
+🎓 Holberton School – Machine Learning Specialization
 Machine Learning Overview
 
 📘 About This Repository
