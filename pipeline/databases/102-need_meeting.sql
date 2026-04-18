@@ -1,1 +1,2 @@
 -- No table for a meeting
+-- Lists students with score < 80 and no meeting or last meeting > 1 month ago
